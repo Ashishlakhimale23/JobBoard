@@ -1,8 +1,8 @@
 import express, { urlencoded }  from "express";
-import cors from "cors"
 import { Connection } from "./Connection";
 import { config } from "dotenv";
 import { userrouter } from "./Routes/user";
+import cors from "cors";
 config()
 const app = express();
 app.use(express.json())

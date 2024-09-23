@@ -1,0 +1,68 @@
+/* Custom Editor Styles */
+.editor-content {
+  /* Set a base font size */
+  font-size: 16px;
+  /* Adjust overall text color */
+  color: #ffffff !important;
+  line-height: 1.5 !important;
+}
+
+.editor-content h1,
+.editor-content h2,
+.editor-content h3 {
+  /* Ensure headings are the same color as the text */
+  color: #ffffff !important;
+  margin-top: 0;
+  margin-bottom: 0;
+  
+}
+
+.editor-content p,
+.editor-content li {
+ 
+  margin-bottom: 0 !important;
+  margin-top: 0!important;
+}
+
+.editor-content ul,
+.editor-content ol {
+  /* Adjust list styles */
+  padding-left: 1.5em !important;
+  /* Reset margin to reduce space before and after lists */
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+}
+
+.editor-content ul {
+  list-style-type: disc !important;
+}
+
+.editor-content ol {
+  list-style-type: decimal !important;
+}
+
+.editor-content li::marker {
+  /* Ensure list markers (bullets and numbers) are the same color as the text */
+  color: #ffffff !important;
+}
+
+.editor-content strong,
+.editor-content em {
+  /* Ensure bold and italic text is the same color */
+  color: #ffffff !important;
+}
+
+/* Override Tailwind Typography responsive font sizes */
+.editor-content.prose,
+.editor-content.prose-sm,
+.editor-content.prose-lg,
+.editor-content.prose-xl,
+.editor-content.prose-2xl {
+  font-size: 16px !important;
+}
+
+/* Adjust spacing between list items */
+
+.editor-content :any-link{
+    color: #ffffff;
+}

@@ -12,10 +12,14 @@ const user = new mongoose.Schema({
         type:String,
         required:true
     },
-    space:[{
+    JobUploaded:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"space"
-    }]
+    }],
+    Application:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"space"
+    }],
     },{
     timestamps:true
 })
