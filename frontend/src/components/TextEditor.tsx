@@ -118,6 +118,7 @@ export const TextEditor = ({initialContent,onUpdate}:{initialContent:JSONContent
     },
     onUpdate({ editor }) {
       const jsonContent = editor.getJSON();
+      console.log(jsonContent)
       onUpdate(jsonContent)
     },
   });

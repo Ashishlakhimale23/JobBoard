@@ -9,12 +9,19 @@ import {
 } from "@/components/ui/select"
 import { useRecoilState } from "recoil";
 import { JSONContent } from "@tiptap/react";
+import { useEffect } from "react";
+import zod, {  ZodType } from "zod"
+import { CreateApplications, CustomAxiosError} from "@/types/type";
+import toast from "react-hot-toast";
+import { api } from "@/utils/AxioApi";
 
 export function CreateApplication(){
+const ACCEPTED_FILE_TYPES = ['image/png','image/jpeg','image/jpg'];
+type ZodSchema = zod.infer<typeof ZodObject>
 
 
-  const [createApplication,setCreateApplication] = useRecoilState(Application);
-  const {JobTitle,JobDescription,Location,ApplicationLink,Type,MaxSalary,MinSalary,Category,WorkMode,CompanyName,CompanyEmail,CompanyBio,CompanyLogo} = createApplication;
+const [createApplication,setCreateApplication] = useRecoilState(Application);
+const {JobTitle,JobDescription,Location,ApplicationLink,Type,MaxSalary,MinSalary,Category,WorkMode,CompanyName,CompanyEmail,CompanyBio,CompanyLogo} = createApplication;
 
 
 const handleInputChange = (field: keyof typeof createApplication, value: any) => {
@@ -24,14 +31,138 @@ const handleInputChange = (field: keyof typeof createApplication, value: any) =>
     }));
   };
 
- const updateJobDescription = (content: JSONContent) => {
+const updateJobDescription = (content: JSONContent) => {
     setCreateApplication(prev => ({ ...prev, JobDescription: content }));
   };
 
-  const updateCompanyBio = (content: JSONContent) => {
+const updateCompanyBio = (content: JSONContent) => {
     setCreateApplication(prev => ({ ...prev, CompanyBio: content }));
   };
 
+useEffect(()=>{
+  localStorage.setItem("application",JSON.stringify(createApplication));
+},[handleInputChange,updateCompanyBio,updateJobDescription])
+
+
+const CreateFormData = ()=>{
+   const formData = new FormData() as FormData & CreateApplications;
+        Object.entries(createApplication).forEach(([key, value]) => {
+          if (value instanceof File) {
+           
+        formData.append(key, value);
+      } else {
+        formData.append(key, value.toString());}
+    });
+    return formData
+}
+
+const tiptapContentSchema = zod.object({
+  type: zod.string(), 
+  content: zod.array(
+    zod.object({
+      type: zod.string(),    
+      content: zod.optional(zod.array(zod.any()))  
+    })
+  )
+});
+
+
+const ZodObject:ZodType<CreateApplications> =zod.object({
+  Category:zod.string({message:"Requires a string"}),
+  Type:zod.string({message:"Requires a string"}),
+  WorkMode:zod.string({message:"Requires a string"}),
+  Location:zod.string({message:"Requires a string"}).optional(),
+  JobTitle:zod.string({message:"Requires a string"}),
+  ApplicationLink:zod.string({message:"Requires a string"}), 
+  CompanyName:zod.string({message:"Requires a string"}),
+  CompanyEmail:zod
+      .string()
+      .email()
+      .refine((email) => email.endsWith("@gmail.com"), {
+        message: "Must be a valid Gmail address",
+      }),
+  MinSalary:zod.number({message:"Give me some salary man"}),
+  MaxSalary:zod.number({message:"Give me some salary man"}),
+  CompanyBio:zod.array(tiptapContentSchema),
+  JobDescription:zod.array(tiptapContentSchema),
+  CompanyLogo:zod.string() || zod.instanceof(File).refine((file) => {
+    return !file || file.size <= 1024*1024*5;
+  }, 'File size must be less than 3MB')
+  .refine((file) => {
+    return ACCEPTED_FILE_TYPES.includes(file.type);
+  }, 'File must be a PNG')
+}) 
+
+const VerifyZodObject=(data:ZodSchema)=>{
+  const result = ZodObject.safeParse(data);
+  return result;
+}
+
+const handleSubmit=async()=>{
+  console.log(createApplication)
+  if(!JobTitle){
+    return toast.error("Fill the field.");
+  }
+  if(!Category){
+    return toast.error("Fill the field.");
+  }
+  if(!Type){
+    return toast.error("Fill the field.");
+  }
+  if(!WorkMode){
+    return toast.error("Fill the field.");
+  }
+  if(!CompanyName){
+    return toast.error("Fill the field.");
+  }
+  if(!CompanyEmail){
+    return toast.error("Fill the field.");
+  }
+  if(!CompanyBio){
+    return toast.error("Fill the field.");
+  }
+  if(!JobDescription){
+    return toast.error("Fill the field");
+  }
+  if(!CompanyLogo){
+    return toast.error("Fill the field");
+  }
+  if(!MinSalary){
+    return toast.error("Fill the field");
+  }
+  if(!MaxSalary){
+    return toast.error("Fill the field");
+  }
+  if(!ApplicationLink){
+    return toast.error('Fill the field');
+  }
+
+  
+
+  try{
+
+    const formdata = CreateFormData();
+    console.log(formdata)
+    const response = await api.post('/applicant/createapplication',formdata,{
+      headers:{"Content-Type": "multipart/form-data"},
+    })
+    console.log(response);
+    return toast.success(response.data.message);
+  }catch(error){
+    if (error) {
+        const axiosError = error as CustomAxiosError;
+
+        if (axiosError.response && axiosError.response.data && axiosError.response.data.message) {
+            return toast.error(axiosError.response.data.message);
+        } else {
+            return toast.error("An unexpected error occurred");
+        }
+    } 
+  }
+
+
+
+}
   return (
     <>
       <div className="min-h-screen bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]">
@@ -171,6 +302,7 @@ const handleInputChange = (field: keyof typeof createApplication, value: any) =>
                     type="number"
                     className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
                     value={MaxSalary}
+                    minLength={0}
 
                       onChange={(e) => handleInputChange('MaxSalary', e.target.value)}
                   />
@@ -234,9 +366,13 @@ const handleInputChange = (field: keyof typeof createApplication, value: any) =>
                   id="companyLogo"
                   type="file"
                   className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
-                  value={typeof CompanyLogo ==="string" ? CompanyLogo : "" }
 
-                  onChange={(e) => handleInputChange('CompanyLogo', e.target.value)}
+                  onChange={(e) =>{ 
+                    console.log(e)
+const file = e.target.files ? e.target.files[0] : null;
+console.log(file)
+      handleInputChange('CompanyLogo', file);
+                   }}
                 />
               </div>
               <div>
@@ -284,6 +420,7 @@ const handleInputChange = (field: keyof typeof createApplication, value: any) =>
               <button
                 type="submit"
                 className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105"
+                onClick={handleSubmit}
               >
                 Submit Job Posting
               </button>

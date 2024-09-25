@@ -1,8 +1,3 @@
-import { AxiosError,AxiosResponse } from "axios"
-import { JSONContent } from "@tiptap/react"
-export interface CustomAxiosError extends AxiosError{
-  response?:AxiosResponse<{message:string}>
-}
 export interface CreateApplications{
   JobTitle:string,
   Category:string,
@@ -12,9 +7,10 @@ export interface CreateApplications{
   MaxSalary:number,
   Location?:string,
   ApplicationLink:string,
-  JobDescription:JSONContent,
+  JobDescription:[{}],
   CompanyLogo:File | string,
   CompanyName:string,
   CompanyEmail:string,
-  CompanyBio:JSONContent
+  CompanyBio:[{}]
 }
+

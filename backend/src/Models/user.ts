@@ -10,8 +10,7 @@ const user = new mongoose.Schema({
     },
     firebaseUid:{
         type:String,
-        required:true
-    },
+        required:true },
     JobUploaded:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"space"
