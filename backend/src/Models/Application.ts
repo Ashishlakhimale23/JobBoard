@@ -16,25 +16,22 @@ const ApplicationSchema = new Schema({
     type: String,
     required: true,
   },
-  MinSalary: {
-    type: Number,
-    required: true,
-  },
-  MaxSalary: {
+  AverageSalary: {
     type: Number,
     required: true,
   },
   Location: {
     type: String,
-    required: true,
   },
   ApplicationLink: {
     type: String,
-    required: true,
   },
-  JobDescription: {
+  Responsibilities: {
     type: [{}],
     required: true,
+  },
+  Qualification: {
+    type: [{}],
   },
   CompanyLogo: {
     type: String,
@@ -48,7 +45,7 @@ const ApplicationSchema = new Schema({
     type: String,
     required: true,
   },
-  CompanyBio: {
+  CompanyOverview: {
     type: [{}],
     required: true,
   },

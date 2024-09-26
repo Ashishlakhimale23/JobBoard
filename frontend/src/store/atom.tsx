@@ -1,26 +1,29 @@
 import { CreateApplications } from "@/types/type"
 import {atom} from "recoil"
-//Default
-export const CreateApplicationDefault:CreateApplications ={
-   JobTitle:"",
-   Category:"Design",
-   WorkMode:"Remote",
-   Type:"Full Time",
-   JobDescription:{
+//Defaults
+export const CreateApplicationDefault: CreateApplications = {
+  JobTitle: "",
+  Category: "Design",
+  WorkMode: "Remote",
+  Type: "Full Time",
+  Responsibilities: {
     type: "doc",
     content: [],
-  }, 
-   ApplicationLink:"",
-   MaxSalary:0,
-   MinSalary:0,
-   CompanyLogo:"",
-   CompanyName:"",
-   CompanyEmail:"",
-   CompanyBio:{
+  },
+  Qualification: {
     type: "doc",
     content: [],
-  }, 
-} 
+  },
+  ApplicationLink: "",
+  AverageSalary: 0,
+  CompanyLogo: "",
+  CompanyName: "",
+  CompanyEmail: "",
+  CompanyOverview: {
+    type: "doc",
+    content: [],
+  },
+}; 
 
 
 
@@ -33,7 +36,7 @@ export const LoggedState = atom<boolean>({
 export const Application = atom<CreateApplications>({
    key:"Applicaton",
    default:(()=>{
-      const saved = localStorage.getItem("Application");
+      const saved = localStorage.getItem("application");
       return saved ? JSON.parse(saved) : CreateApplicationDefault;
    })()
 })

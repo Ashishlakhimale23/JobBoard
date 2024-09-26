@@ -8,13 +8,13 @@ export interface CreateApplications{
   Category:string,
   WorkMode:string,
   Type:string,
-  MinSalary:number,
-  MaxSalary:number,
-  Location?:string,
-  ApplicationLink:string,
-  JobDescription:JSONContent,
+  AverageSalary:number,
+  ApplicationLink?:string, 
+  Location?:string, 
+  Qualification?:JSONContent,
+  Responsibilities:JSONContent,
   CompanyLogo:File | string,
   CompanyName:string,
   CompanyEmail:string,
-  CompanyBio:JSONContent
+  CompanyOverview:JSONContent
 }

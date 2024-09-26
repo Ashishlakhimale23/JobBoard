@@ -7,7 +7,7 @@ export const CreateApplication =async (req:Request,res:Response)=>{
     if(!req.body){
         return res.status(400).json({message:"application field is empty."})
     }
-    const {Category,MaxSalary,MinSalary,Type,WorkMode,Location,ApplicationLink,JobDescription,JobTitle,CompanyBio,CompanyEmail,CompanyName} = req.body;
+    const {Category,AverageSalary,Type,WorkMode,Location,ApplicationLink,Responsibilities,Qualification,JobTitle,CompanyOverview,CompanyEmail,CompanyName} = req.body;
     try{
 
         if(!req.file) {
@@ -17,15 +17,15 @@ export const CreateApplication =async (req:Request,res:Response)=>{
 
         const Createdapplication = new Application({
             Category,
-            MaxSalary,
-            MinSalary,
+            AverageSalary,
             Type,
             WorkMode,
             Location,
             ApplicationLink,
-            JobDescription,
+            Qualification,
+            Responsibilities,
             JobTitle,
-            CompanyBio,
+            CompanyOverview,
             CompanyEmail,
             CompanyLogo:Image,
             CompanyName

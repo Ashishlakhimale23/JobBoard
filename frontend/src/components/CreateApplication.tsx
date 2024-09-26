@@ -9,160 +9,186 @@ import {
 } from "@/components/ui/select"
 import { useRecoilState } from "recoil";
 import { JSONContent } from "@tiptap/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import zod, {  ZodType } from "zod"
 import { CreateApplications, CustomAxiosError} from "@/types/type";
 import toast from "react-hot-toast";
 import { api } from "@/utils/AxioApi";
 
 export function CreateApplication(){
-const ACCEPTED_FILE_TYPES = ['image/png','image/jpeg','image/jpg'];
-type ZodSchema = zod.infer<typeof ZodObject>
+  
+  const [createApplication, setCreateApplication] = useRecoilState(Application);
+  const {
+    JobTitle,
+    Qualification,
+    Responsibilities,
+    Location,
+    ApplicationLink,
+    Type,
+    AverageSalary,
+    Category,
+    WorkMode,
+    CompanyName,
+    CompanyEmail,
+    CompanyOverview,
+    CompanyLogo,
+  } = createApplication;
 
-
-const [createApplication,setCreateApplication] = useRecoilState(Application);
-const {JobTitle,JobDescription,Location,ApplicationLink,Type,MaxSalary,MinSalary,Category,WorkMode,CompanyName,CompanyEmail,CompanyBio,CompanyLogo} = createApplication;
-
-
-const handleInputChange = (field: keyof typeof createApplication, value: any) => {
-    setCreateApplication(prev => ({
+  const handleInputChange = (
+    field: keyof typeof createApplication,
+    value: any
+  ) => {
+    setCreateApplication((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-const updateJobDescription = (content: JSONContent) => {
-    setCreateApplication(prev => ({ ...prev, JobDescription: content }));
+  const updateJobDescription = (content: JSONContent) => {
+    setCreateApplication((prev) => ({ ...prev, Responsibilities: content }));
   };
 
-const updateCompanyBio = (content: JSONContent) => {
-    setCreateApplication(prev => ({ ...prev, CompanyBio: content }));
+  const updateCompanyBio = (content: JSONContent) => {
+    setCreateApplication((prev) => ({ ...prev, CompanyOverview: content }));
   };
 
-useEffect(()=>{
-  localStorage.setItem("application",JSON.stringify(createApplication));
-},[handleInputChange,updateCompanyBio,updateJobDescription])
+  const updateQualification= (content: JSONContent) => {
+    setCreateApplication((prev) => ({ ...prev, Qualification: content }));
+  };
 
-
-const CreateFormData = ()=>{
-   const formData = new FormData() as FormData & CreateApplications;
-        Object.entries(createApplication).forEach(([key, value]) => {
-          if (value instanceof File) {
-           
+  const CreateFormData = () => {
+    const formData = new FormData() as FormData & CreateApplications;
+    Object.entries(createApplication).forEach(([key, value]) => {
+      if (value instanceof File) {
         formData.append(key, value);
+      }
+      else if(value instanceof Object){
+        formData.append(key,value)
       } else {
-        formData.append(key, value.toString());}
+        formData.append(key, value.toString());
+      }
     });
-    return formData
-}
+    return formData;
+  };
 
-const tiptapContentSchema = zod.object({
-  type: zod.string(), 
-  content: zod.array(
-    zod.object({
-      type: zod.string(),    
-      content: zod.optional(zod.array(zod.any()))  
-    })
-  )
+
+
+const ZodObject: ZodType<any> = zod.object({
+  Category: zod.string({ message: "Requires a string" }),
+  Type: zod.string({ message: "Requires a string" }),
+  WorkMode: zod.string({ message: "Requires a string" }),
+  Location: zod.string({ message: "Requires a string" }).optional(),
+  JobTitle: zod.string({ message: "Requires a string" }),
+  ApplicationLink: zod.string({ message: "Requires a string" }).optional(),
+  CompanyName: zod.string({ message: "Requires a string" }),
+  CompanyEmail: zod
+    .string()
+    .email()
+    .refine((email) => email.endsWith("@gmail.com"), {
+      message: "Must be a valid Gmail address",
+    }),
+  AverageSalary: zod.coerce.number({ message: "Give me some salary man" }),
+ 
+  CompanyLogo: zod
+    .string()
+    .or(
+      zod
+        .instanceof(File)
+        .refine((file) => {
+          return !file || file.size <= 1024 * 1024 * 3; // 3MB limit (Update this according to your needs)
+        }, "File size must be less than 3MB")
+        .refine((file) => {
+          const ACCEPTED_FILE_TYPES = ['image/png']; // Ensure this is defined
+          return ACCEPTED_FILE_TYPES.includes(file.type);
+        }, "File must be a PNG")
+    ),
 });
 
 
-const ZodObject:ZodType<CreateApplications> =zod.object({
-  Category:zod.string({message:"Requires a string"}),
-  Type:zod.string({message:"Requires a string"}),
-  WorkMode:zod.string({message:"Requires a string"}),
-  Location:zod.string({message:"Requires a string"}).optional(),
-  JobTitle:zod.string({message:"Requires a string"}),
-  ApplicationLink:zod.string({message:"Requires a string"}), 
-  CompanyName:zod.string({message:"Requires a string"}),
-  CompanyEmail:zod
-      .string()
-      .email()
-      .refine((email) => email.endsWith("@gmail.com"), {
-        message: "Must be a valid Gmail address",
-      }),
-  MinSalary:zod.number({message:"Give me some salary man"}),
-  MaxSalary:zod.number({message:"Give me some salary man"}),
-  CompanyBio:zod.array(tiptapContentSchema),
-  JobDescription:zod.array(tiptapContentSchema),
-  CompanyLogo:zod.string() || zod.instanceof(File).refine((file) => {
-    return !file || file.size <= 1024*1024*5;
-  }, 'File size must be less than 3MB')
-  .refine((file) => {
-    return ACCEPTED_FILE_TYPES.includes(file.type);
-  }, 'File must be a PNG')
-}) 
-
-const VerifyZodObject=(data:ZodSchema)=>{
+const VerifyZodObject = (data: any) => {
   const result = ZodObject.safeParse(data);
   return result;
-}
+};
+  const handleSubmit = async () => {
+    console.log(createApplication);
+    if (!JobTitle) {
+      return toast.error("Fill the field Job title.");
+    }
+    if (!Category) {
+      return toast.error("Fill the field.");
+    }
+    if (!Type) {
+      return toast.error("Fill the field.");
+    }
+    if (!WorkMode) {
+      return toast.error("Fill the field.");
+    }
+    if (!CompanyName) {
+      return toast.error("Fill the field company name.");
+    }
+    if (!CompanyEmail) {
+      return toast.error("Fill the field company email.");
+    }
+    if (!CompanyOverview) {
+      return toast.error("Fill the field company bio.");
+    }
+    if (!Responsibilities) {
+      return toast.error("Fill the field job description.");
+    }
+    if (!CompanyLogo) {
+      return toast.error("Fill the company logo.");
+    }
+    if(!Location && WorkMode!="Remote"){
+      return toast.error("Fill the location field.")
+    }
+    if (!AverageSalary) {
+      return toast.error("Fill the max salary.");
+    }
+    
 
-const handleSubmit=async()=>{
-  console.log(createApplication)
-  if(!JobTitle){
-    return toast.error("Fill the field.");
-  }
-  if(!Category){
-    return toast.error("Fill the field.");
-  }
-  if(!Type){
-    return toast.error("Fill the field.");
-  }
-  if(!WorkMode){
-    return toast.error("Fill the field.");
-  }
-  if(!CompanyName){
-    return toast.error("Fill the field.");
-  }
-  if(!CompanyEmail){
-    return toast.error("Fill the field.");
-  }
-  if(!CompanyBio){
-    return toast.error("Fill the field.");
-  }
-  if(!JobDescription){
-    return toast.error("Fill the field");
-  }
-  if(!CompanyLogo){
-    return toast.error("Fill the field");
-  }
-  if(!MinSalary){
-    return toast.error("Fill the field");
-  }
-  if(!MaxSalary){
-    return toast.error("Fill the field");
-  }
-  if(!ApplicationLink){
-    return toast.error('Fill the field');
-  }
+    const ParsedResult = VerifyZodObject(createApplication);
+     if(!ParsedResult.success){
+      const problem:string= ParsedResult.error.issues[0].message
+      console.log(ParsedResult)
+          return toast.error(problem)
+    }
 
-  
-
-  try{
-
-    const formdata = CreateFormData();
-    console.log(formdata)
-    const response = await api.post('/applicant/createapplication',formdata,{
-      headers:{"Content-Type": "multipart/form-data"},
-    })
-    console.log(response);
-    return toast.success(response.data.message);
-  }catch(error){
-    if (error) {
+    const toastid = toast.loading("Submitting...")
+    try {
+      const formdata = CreateFormData();
+      const response = await api.post(
+        "/applicant/createapplication",
+        formdata,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      setCreateApplication(CreateApplicationDefault)
+      return toast.success(response.data.message);
+    } catch (error) {
+      if (error) {
         const axiosError = error as CustomAxiosError;
 
-        if (axiosError.response && axiosError.response.data && axiosError.response.data.message) {
-            return toast.error(axiosError.response.data.message);
+        if (
+          axiosError.response &&
+          axiosError.response.data &&
+          axiosError.response.data.message
+        ) {
+          return toast.error(axiosError.response.data.message);
         } else {
-            return toast.error("An unexpected error occurred");
+          return toast.error("An unexpected error occurred");
         }
-    } 
-  }
+      }
+    }finally{
+      toast.dismiss(toastid)
+    }
+  };
+
+  useEffect(() => {
+    localStorage.setItem("application", JSON.stringify(createApplication));
+  }, [handleInputChange, updateCompanyBio, updateJobDescription,handleSubmit]);
 
 
-
-}
   return (
     <>
       <div className="min-h-screen bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]">
@@ -172,7 +198,11 @@ const handleSubmit=async()=>{
           </h1>
           <div className="space-y-8 bg-neutral-900/50 sm:p-8 p-2 rounded-lg backdrop-blur-sm">
             <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-white">
+                Job Information
+              </h2>
               <div>
+              
                 <label
                   htmlFor="jobTitle"
                   className="block text-sm font-medium text-gray-300 mb-1"
@@ -181,11 +211,13 @@ const handleSubmit=async()=>{
                 </label>
                 <input
                   id="jobTitle"
+                  autoComplete="off"
                   type="text"
-                  className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="w-full appearance-none bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
                   value={JobTitle}
-                  onChange={(e) => handleInputChange('JobTitle',e.target.value)}
-
+                  onChange={(e) =>
+                    handleInputChange("JobTitle", e.target.value)
+                  }
                 />
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
@@ -196,28 +228,26 @@ const handleSubmit=async()=>{
                   >
                     Category
                   </label>
-                   <Select
-
-                      onValueChange={(value) => handleInputChange('Category', value)} 
-
-                      value={Category}
-                   >
-
-                  <SelectTrigger className="w-full bg-neutral-800/50 focus:ring-offset-0 h-fit p-[14px] focus:ring-2 focus:ring-blue-500 transition border-none "
+                  <Select
+                    onValueChange={(value) =>
+                      handleInputChange("Category", value)
+                    }
+                    value={Category}
+                  >
+                    <SelectTrigger
+                      className="w-full bg-neutral-800/50 focus:ring-offset-0 h-fit p-[14px] focus:ring-2 focus:ring-blue-500 transition border-none "
                       defaultValue={CreateApplicationDefault.Category}
-                      >
-                    <SelectValue
-                      className="focus:outline-none"
-                    />
-                  </SelectTrigger>
-                  <SelectContent className="bg-neutral-800 text-white border-none shadow-lg">
-                    <SelectItem value="Design">Design</SelectItem>
-                    <SelectItem value="Development">Development</SelectItem>
-                    <SelectItem value="Management">Management</SelectItem>
-                    <SelectItem value="Marketing">Marketing</SelectItem>
-                    <SelectItem value="Finance">Finance</SelectItem>
-                  </SelectContent>
-                </Select>
+                    >
+                      <SelectValue className="focus:outline-none" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-neutral-800 text-white border-none shadow-lg">
+                      <SelectItem value="Design">Design</SelectItem>
+                      <SelectItem value="Development">Development</SelectItem>
+                      <SelectItem value="Management">Management</SelectItem>
+                      <SelectItem value="Marketing">Marketing</SelectItem>
+                      <SelectItem value="Finance">Finance</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label
@@ -227,24 +257,20 @@ const handleSubmit=async()=>{
                     Work Mode
                   </label>
                   <Select
-
-                      onValueChange={(value) => handleInputChange('WorkMode', value)} 
-
-                  value={WorkMode}
+                    onValueChange={(value) =>
+                      handleInputChange("WorkMode", value)
+                    }
+                    value={WorkMode}
                   >
-
-                  <SelectTrigger className="w-full bg-neutral-800/50 focus:ring-offset-0 h-fit p-[14px] focus:ring-2 focus:ring-blue-500 transition border-none "
-                  >
-                    <SelectValue
-                      className="focus:outline-none"
-                    />
-                  </SelectTrigger>
-                  <SelectContent className="bg-neutral-800 text-white border-none shadow-lg">
-                    <SelectItem value="Hybrid">Hybrid</SelectItem>
-                    <SelectItem value="Office">Office</SelectItem>
-                    <SelectItem value="Remote">Remote</SelectItem>
-                  </SelectContent>
-                </Select>
+                    <SelectTrigger className="w-full bg-neutral-800/50 focus:ring-offset-0 h-fit p-[14px] focus:ring-2 focus:ring-blue-500 transition border-none ">
+                      <SelectValue className="focus:outline-none" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-neutral-800 text-white border-none shadow-lg">
+                      <SelectItem value="Hybrid">Hybrid</SelectItem>
+                      <SelectItem value="Office">Office</SelectItem>
+                      <SelectItem value="Remote">Remote</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="">
@@ -255,17 +281,14 @@ const handleSubmit=async()=>{
                   Type
                 </label>
                 <Select
-
                   value={Type}
-                      onValueChange={(value) => handleInputChange('Type', value)} 
-                 >
-                  <SelectTrigger className="w-full bg-neutral-800/50  focus:ring-offset-0 h-fit p-[14px] focus:ring-2 focus:ring-blue-500 transition border-none "
-                  defaultValue="Full Time"
-                  
-                      >
-                    <SelectValue
-                      className="focus:outline-none"
-                    />
+                  onValueChange={(value) => handleInputChange("Type", value)}
+                >
+                  <SelectTrigger
+                    className="w-full bg-neutral-800/50  focus:ring-offset-0 h-fit p-[14px] focus:ring-2 focus:ring-blue-500 transition border-none "
+                    defaultValue="Full Time"
+                  >
+                    <SelectValue className="focus:outline-none" />
                   </SelectTrigger>
                   <SelectContent className="bg-neutral-800 text-white border-none shadow-lg">
                     <SelectItem value="Full Time">Full Time</SelectItem>
@@ -275,40 +298,28 @@ const handleSubmit=async()=>{
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="">
                 <div>
                   <label
                     htmlFor="min"
-                    className="block text-sm font-medium text-gray-300 mb-1" > Min Salary
+                    className="block text-sm font-medium text-gray-300 mb-1"
+                  >
+                   Average Salary(in dollars) 
                   </label>
                   <input
                     id="min"
                     type="number"
                     className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
-                    value={MinSalary}
-
-                      onChange={(e) => handleInputChange('MinSalary', e.target.value)}
-                     />
-                     </div>
-                <div>
-                  <label
-                    htmlFor="max"
-                    className="block text-sm font-medium text-gray-300 mb-1"
-                  >
-                    Max Salary
-                  </label>
-                  <input
-                    id="max"
-                    type="number"
-                    className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
-                    value={MaxSalary}
-                    minLength={0}
-
-                      onChange={(e) => handleInputChange('MaxSalary', e.target.value)}
+                    value={AverageSalary}
+                    autoComplete="off"
+                    onChange={(e) =>
+                      handleInputChange("AverageSalary", e.target.value)
+                    }
                   />
                 </div>
+                
               </div>
-              <div>
+              <div className={`${WorkMode==='Remote'? "hidden":"block"}`}>
                 <label
                   htmlFor="location"
                   className="block text-sm font-medium text-gray-300 mb-1"
@@ -320,8 +331,10 @@ const handleSubmit=async()=>{
                   type="text"
                   className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
                   value={Location}
-
-                      onChange={(e) => handleInputChange('Location', e.target.value)}
+                  autoComplete="off"
+                  onChange={(e) =>
+                    handleInputChange("Location", e.target.value)
+                  }
                 />
               </div>
               <div>
@@ -329,31 +342,48 @@ const handleSubmit=async()=>{
                   htmlFor="applicationLink"
                   className="block text-sm font-medium text-gray-300 mb-1"
                 >
-                  Application Link
+                  Application Link (optional)
                 </label>
                 <input
                   id="applicationLink"
                   type="text"
                   className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
                   value={ApplicationLink}
+                  autoComplete="off"
+                  onChange={(e) =>
+                    handleInputChange("ApplicationLink", e.target.value)
+                  }
+                />
+              </div>
+            </div>
 
-                      onChange={(e) => handleInputChange('ApplicationLink', e.target.value)}
+            <div className="space-y-4">
+              <label className="text-lg font-semibold text-white">
+                Responsibililties
+              </label>
+              <div>
+                <TextEditor
+                  initialContent={Responsibilities}
+                  onUpdate={updateJobDescription}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-white">
+                Qualifications
+              </h2>
+              <div>
+                <TextEditor
+                  initialContent={Qualification!}
+                  onUpdate={updateQualification}
                 />
               </div>
             </div>
 
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-white">
-                Job Description
-              </h2>
-              <div>
-                <TextEditor initialContent={JobDescription} onUpdate={updateJobDescription} />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-white">
-                Company Information
+                Company's Information
               </h2>
               <div>
                 <label
@@ -366,13 +396,12 @@ const handleSubmit=async()=>{
                   id="companyLogo"
                   type="file"
                   className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
-
-                  onChange={(e) =>{ 
-                    console.log(e)
-const file = e.target.files ? e.target.files[0] : null;
-console.log(file)
-      handleInputChange('CompanyLogo', file);
-                   }}
+                  onChange={(e) => {
+                    console.log(e);
+                    const file = e.target.files ? e.target.files[0] : null;
+                    console.log(file);
+                    handleInputChange("CompanyLogo", file);
+                  }}
                 />
               </div>
               <div>
@@ -385,9 +414,12 @@ console.log(file)
                 <input
                   id="companyName"
                   type="text"
+                  autoComplete="off"
                   className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
                   value={CompanyName}
-                  onChange={(e) => handleInputChange('CompanyName', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("CompanyName", e.target.value)
+                  }
                 />
               </div>
               <div>
@@ -399,10 +431,13 @@ console.log(file)
                 </label>
                 <input
                   id="companyEmail"
+                  autoComplete="off"
                   type="email"
                   className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
                   value={CompanyEmail}
-                  onChange={(e) => handleInputChange('CompanyEmail', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("CompanyEmail", e.target.value)
+                  }
                 />
               </div>
               <div className="">
@@ -410,9 +445,12 @@ console.log(file)
                   htmlFor="companyBio"
                   className="block text-sm font-medium text-gray-300 mb-1"
                 >
-                  Company Bio
+                  Company Overview
                 </label>
-                <TextEditor initialContent={CompanyBio} onUpdate={updateCompanyBio}/>
+                <TextEditor
+                  initialContent={CompanyOverview}
+                  onUpdate={updateCompanyBio}
+                />
               </div>
             </div>
 
