@@ -96,76 +96,133 @@ export function Home() {
     }
   };
 return (
-    <div className="relative min-h-screen w-full bg-neutral-950 overflow-hidden">
-     
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
-      
+   <div className=" min-h-screen w-full bg-black overflow-hidden">
   
-      <div className="relative z-10 px-4 md:px-6 py-8 space-y-12 max-w-7xl mx-auto">
-    
-        <header className="flex justify-center sm:justify-between items-center mb-16">
-          <div className="text-blue-500 font-bold text-2xl md:text-3xl">
-            SkillSphere
-          </div>
-          <div className="space-x-4 hidden sm:block">
-            <button
-              className="px-4 sm:px-6 py-2 border border-white text-white rounded-lg hover:bg-white hover:text-black transition-colors"
-              onClick={handleGoogleSubmit}
-            >
-              Join now
-            </button>
-            <button
-              className="px-4 sm:px-6 py-2 border bg-white text-black rounded-lg hover:bg-blue-500 hover:text-white transition-colors"
-              onClick={handlegooglesubmit}
-            >
-              Signup
-            </button>
-          </div>
-        </header>
 
-        
-        <div className="flex flex-col items-center text-center space-y-6 md:space-y-8">
-          <h1 className="text-white text-2xl md:text-3xl lg:text-4xl font-bold">
-            Connecting talent with jobs.
-          </h1>
-          <TypewriterEffect
-            words={[
-              { text: "Find" },
-              { text: "Your" },
-              { text: "Next" },
-              { text: "Opportunity" },
-              { text: "with"},
-              { text: "SkillSphere.", className: "text-blue-500 font-bold" },
-            ]}
-            className="text-2xl md:text-3xl lg:text-4xl"
-          />
-          <div className="space-x-4 block sm:hidden">
-            <button
-              className="px-4 sm:px-6 py-2 border border-white text-white rounded-lg hover:bg-white hover:text-black transition-colors"
-              onClick={handleGoogleSubmit}
-            >
-              Join now
-            </button>
-            <button
-              className="px-4 sm:px-6 py-2 border bg-white text-black rounded-lg hover:bg-blue-500 hover:text-white transition-colors"
-              onClick={handlegooglesubmit}
-            >
-              Signup
-            </button>
-          </div>
-        </div>
-        
 
-        <div className="space-y-4">
-        <div>
-          <p className="text-xl font-semibold text-blue-500/95">Trending jobs .</p>
-        </div>
-          <JobCard Type="Development" JobTitle="Full stack" AverageSalary={90000} Location="" WorkMode="Remote" CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"/>
-          <JobCard Type="Development" JobTitle="Full stack" AverageSalary={90000} Location="" WorkMode="Remote" CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"/>
-          <JobCard Type="Development" JobTitle="Full stack" AverageSalary={90000} Location="" WorkMode="Remote" CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"/>
-          <JobCard Type="Development" JobTitle="Full stack" AverageSalary={90000} Location="" WorkMode="Remote" CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"/>
-        </div>
+  <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+
+    <header className="flex justify-center sm:justify-between items-center ">
+      <div className=" font-bold text-2xl md:text-3xl">
+        <span className="bg-gradient-to-tr from-pink-500 via-red-500 to-orange-500 bg-clip-text text-transparent">Skill</span>
+        <span className="text-white">Sphere</span>
+      </div>
+
+      <div className="space-x-4 hidden sm:flex">
+        <button
+          className="px-4 sm:px-6 py-2 border border-white text-white rounded-lg hover:bg-white hover:text-black transition-colors"
+          onClick={handleGoogleSubmit}
+        >
+          Join now
+        </button>
+        <button
+          className="px-4 sm:px-6 py-2 border bg-white text-black rounded-lg hover:bg-black hover:text-white transition-colors"
+          onClick={handlegooglesubmit}
+        >
+          Signup
+        </button>
+      </div>
+    </header>
+
+
+    <div className="flex flex-col items-center justify-center text-center space-y-6 md:space-y-8 h-[calc(100vh-176px)]">
+      <p className="bg-gradient-to-b p-3 text-transparent bg-clip-text from-white to-gray-400 text-3xl md:text-4xl lg:text-5xl font-bold">
+        Connecting talent with jobs.
+      </p>
+
+   
+      <TypewriterEffect
+        words={[
+          { text: "Find" },
+          { text: "Your" },
+          { text: "Next" },
+          { text: "Opportunity" },
+          { text: "with" },
+          {
+            text: "SkillSphere.",
+            className: "text-blue-500 font-bold ",
+          },
+        ]}
+        className="text-2xl md:text-4xl lg:text-5xl "
+      />
+
+
+      <div className="space-x-4 block sm:hidden">
+        <button
+          className="px-4 sm:px-6 py-2 border border-white text-white rounded-lg hover:bg-white hover:text-black transition-colors"
+          onClick={handleGoogleSubmit}
+        >
+          Join now
+        </button>
+        <button
+          className="px-4 sm:px-6 py-2 border bg-white text-black rounded-lg hover:bg-black hover:text-white transition-colors"
+          onClick={handlegooglesubmit}
+        >
+          Signup
+        </button>
       </div>
     </div>
+  </div>
+
+
+  <div className=" z-10 px-4 md:px-6 py-16 space-y-6 max-w-7xl mx-auto min-h-screen ">
+    <div className="inline-block">
+      <p className="text-xl font-semibold text-white">Trending jobs</p>
+    </div>
+
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 ">
+<JobCard
+      Type="Development"
+      JobTitle="Full stack"
+      AverageSalary={90000}
+      Location=""
+      WorkMode="Remote"
+      CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"
+    />
+<JobCard
+      Type="Development"
+      JobTitle="Full stack"
+      AverageSalary={90000}
+      Location=""
+      WorkMode="Remote"
+      CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"
+    />
+    <JobCard
+      Type="Development"
+      JobTitle="Full stack"
+      AverageSalary={90000}
+      Location=""
+      WorkMode="Remote"
+      CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"
+    />
+    <JobCard
+      Type="Development"
+      JobTitle="Full stack"
+      AverageSalary={90000}
+      Location=""
+      WorkMode="Remote"
+      CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"
+    />
+    <JobCard
+      Type="Development"
+      JobTitle="Full stack"
+      AverageSalary={90000}
+      Location=""
+      WorkMode="Remote"
+      CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"
+    />
+    <JobCard
+      Type="Development"
+      JobTitle="Full stack"
+      AverageSalary={90000}
+      Location=""
+      WorkMode="Remote"
+      CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"
+    />
+  </div>
+
+</div>
+</div>
+
   );
 }

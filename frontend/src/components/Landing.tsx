@@ -58,7 +58,7 @@ export const TypewriterEffect = ({
                     ` text-white opacity-0 hidden`,
                     word.className,
                     // Apply blue color to the last word
-                    idx === wordsArray.length - 1 && "text-blue-500"
+                    idx === wordsArray.length - 1 && "bg-gradient-to-tr from-pink-500 via-red-500 to-orange-500 bg-clip-text text-transparent"
 
                   )}
                 >
@@ -75,7 +75,7 @@ export const TypewriterEffect = ({
   return (
     <div
       className={cn(
-        "text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold text-center ",
+        "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center ",
         className
       )}
     >
@@ -181,7 +181,7 @@ export const TypewriterEffectSmooth = ({
           repeatType: "reverse",
         }}
         className={cn(
-          "block rounded-sm w-[4px]  h-4 sm:h-6 xl:h-12 bg-blue-500 b",
+          "block rounded-sm w-[4px]  h-4 sm:h-6 xl:h-12 bg-blue-500 ",
           cursorClassName
         )}
       ></motion.span>

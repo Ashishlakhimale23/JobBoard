@@ -7,9 +7,10 @@ export function Layout(){
     return (
       <>
         <Routes>
-          <Route path="/landing" element={<Home/>} />
-          <Route path="/createpost" element={<CreateApplication/>}/>
+          <Route path="/" element={<Home/>} />
           <Route element={<PrivateRoute/>}>
+
+          <Route path="/createpost" element={<CreateApplication/>}/>
           </Route>
         </Routes>
       </>
