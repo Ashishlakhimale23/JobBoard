@@ -49,5 +49,12 @@ const ApplicationSchema = new Schema({
     type: [{}],
     required: true,
   },
+  JobLink:{
+    type:String,
+    required:true,
+    unique:true
+  }
+},{
+  timestamps:true
 });
 export const Application = model("Application",ApplicationSchema);

@@ -70,7 +70,7 @@ export function Home() {
       });
 
       if (Object.values(response.data).includes("created account")) {
-        localStorage.setItem("AccessToken", idToken);
+        localStorage.setItem("AccessToken",idToken);
         setLogged(true);
       } else {
         return toast.error(response.data.message);

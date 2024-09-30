@@ -1,3 +1,8 @@
+import { api } from "@/utils/AxioApi";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+
+
 export function JobCard({
   CompanyLogo,
   JobTitle,
@@ -13,8 +18,12 @@ export function JobCard({
   Location: string;
   AverageSalary: number;
 }) {
+
+
+
+
   return (
-    <div className="bg-zinc-950 h-fit w-full hover:bg-zinc-800 rounded-lg shadow-lg px-6 py-8 flex flex-col space-y-6 justify-between ">
+    <div className="bg-zinc-950 h-fit w-full hover:bg-zinc-800 rounded-lg transition-colors duration-300 px-6 py-8 flex flex-col space-y-6 justify-between ">
 
       <div className=" space-y-6 p-2">
      
