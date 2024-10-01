@@ -1,7 +1,6 @@
 import { HomeJobCard } from "../components/HomeJobCard"
 import { api } from "@/utils/AxioApi";
 import { useState,useEffect,useCallback } from "react";
-import { toast } from "react-hot-toast";
 import debounce from "lodash.debounce"
 
 export function Jobs(){
@@ -13,6 +12,7 @@ export function Jobs(){
   AverageSalary: number;
   CompanyLogo: string;
   Location: string;
+  JobLink:string
 }
 
 enum Jobs {
@@ -32,10 +32,8 @@ enum Jobs {
   const getAllApplications = async (jobType: Jobs): Promise<JobApplication[]> => {
     try {
       const response = await api.get(`/applicant/getallapplication${jobType}`);
-      console.log(response.data.Data);
       return response.data.Data;
     } catch (error) {
-      toast.error("An error occurred while fetching applications");
       return [];
     }
   };
@@ -145,6 +143,7 @@ const debouncedSearch = useCallback(
             Location={app.Location}
             WorkMode={app.WorkMode}
             CompanyLogo={app.CompanyLogo}
+            JobLink={app.JobLink}
           />
             ))
 
@@ -154,6 +153,7 @@ const debouncedSearch = useCallback(
            <HomeJobCard
            key={index}
             Type={app.Type}
+            JobLink={app.JobLink}
             JobTitle={app.JobTitle}
             AverageSalary={app.AverageSalary}
             Location={app.Location}

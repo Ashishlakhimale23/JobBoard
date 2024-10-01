@@ -1,7 +1,13 @@
-export function HomeJobCard({CompanyLogo,JobTitle,Type,WorkMode,Location,AverageSalary}:{CompanyLogo:string,JobTitle:string,Type:string,WorkMode:string,Location:string,AverageSalary:number}){
+import { useNavigate } from "react-router-dom";
+
+export function HomeJobCard({CompanyLogo,JobTitle,Type,WorkMode,Location,AverageSalary,JobLink}:{CompanyLogo:string,JobTitle:string,Type:string,WorkMode:string,Location:string,AverageSalary:number,JobLink:string}){
+  const navigate = useNavigate()
   return (
+
     <>
-      <div className="rounded-2xl bg-zinc-950/85 sm:flex sm:justify-between space-y-4 sm:space-y-0  px-4 py-6  hover:bg-neutral-900/90 transition-colors duration-300 antialiased">
+      <div className="rounded-2xl bg-zinc-950/85 sm:flex sm:justify-between space-y-4 sm:space-y-0  px-4 py-6  hover:bg-neutral-900/90 transition-colors duration-300 antialiased"
+      onClick={()=>navigate(`/job/${JobLink}`)}
+      >
       <div className="sm:flex sm:space-x-3 space-y-4 sm:space-y-0">
         <div>
           <img src={CompanyLogo} alt="" className="h-12 w-12 rounded-full" />

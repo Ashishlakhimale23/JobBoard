@@ -16,5 +16,5 @@ export interface CreateApplications{
   CompanyLogo:File | string,
   CompanyName:string,
   CompanyEmail:string,
-  CompanyOverview:JSONContent
+  CompanyOverview:JSONContent 
 }

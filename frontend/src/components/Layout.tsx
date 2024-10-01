@@ -4,6 +4,7 @@ import { CreateApplication } from "./CreateApplication";
 import { Home } from "../pages/LandingPage";
 import { Jobs } from "../pages/Jobs";
 import { Header } from "./Header";
+import { JobInfo } from "@/pages/JobInfo";
 
 export function Layout(){
   const onheader:[string] = ['/'];
@@ -17,6 +18,7 @@ export function Layout(){
           <Route element={<PrivateRoute/>}>
           <Route path="/jobs" element={<Jobs/>} />
          <Route path="/createpost" element={<CreateApplication/>}/>
+         <Route path="/job/:jobLink" element={<JobInfo/>}/>
           </Route>
         </Routes>
       </>

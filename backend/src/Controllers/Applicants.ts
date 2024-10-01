@@ -63,7 +63,7 @@ export const CreateApplication =async (req:Request,res:Response)=>{
 
 export const GetAllApplications=async(req:Request,res:Response)=>{
     try{
-        const response = await Application.find().select("JobTitle WorkMode Location Type AverageSalary CompanyLogo");
+        const response = await Application.find().select("JobTitle WorkMode Location Type AverageSalary CompanyLogo JobLink");
         if(!response.length){
             return res.status(404).json({ message: 'No applications found' });
         }
@@ -125,5 +125,23 @@ export const GetAllApplicationsWithRecent=async(req:Request,res:Response)=>{
         return res.status(200).json({Data:response});
     }catch(error){
         return res.status(500).json({message:'internal error'})
+    }
+}
+
+export const GetParticularJob=async(req:Request,res:Response)=>{
+    console.log(req)
+    const jobLink = req.query.jobLink as string;
+    console.log(jobLink);
+    if(!jobLink){
+        return res.status(404).json({message:"no joblink"})
+    }
+    try{
+        const response = await Application.findOne({JobLink:jobLink});
+        if(!response){
+            return res.status(404).json({message:"No application found"});
+        }
+        return res.status(200).json({Data:response});
+    }catch(error){
+        return res.status(500).json({message:'internal server error'})
     }
 }

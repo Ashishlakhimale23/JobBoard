@@ -63,7 +63,7 @@ export function CreateApplication(){
         formData.append(key, value);
       }
       else if(value instanceof Object){
-        formData.append(key,value)
+        formData.append(key,JSON.stringify(value))
       } else {
         formData.append(key, value.toString());
       }
@@ -448,7 +448,7 @@ const VerifyZodObject = (data: any) => {
                   Company Overview
                 </label>
                 <TextEditor
-                  initialContent={CompanyOverview}
+                  initialContent={CompanyOverview as JSONContent}
                   onUpdate={updateCompanyBio}
                 />
               </div>

@@ -6,8 +6,11 @@ import axios from "axios";
 import { LoggedState } from "../store/atom";
 import { useRecoilState } from "recoil";
 import { JobCard } from "@/components/JobCard";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 export function Home() {
   const [logged, setLogged] = useRecoilState<boolean>(LoggedState);
+  const navigate = useNavigate()
 
   const handlegooglesubmit = async () => {
     const provider = new GoogleAuthProvider();
@@ -95,6 +98,13 @@ export function Home() {
       }
     }
   };
+
+
+  useEffect(()=>{
+    navigate('/jobs')
+    
+
+  },[logged])
 return (
    <div className=" min-h-screen w-full bg-black overflow-hidden">
   
