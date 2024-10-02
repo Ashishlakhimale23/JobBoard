@@ -145,3 +145,34 @@ export const GetParticularJob=async(req:Request,res:Response)=>{
         return res.status(500).json({message:'internal server error'})
     }
 }
+
+export const EditProfile=async(req:Request,res:Response)=>{
+    const uid = req.uid
+    if(!req.body){
+        return res.status(400).json({message:"no data provided"})
+    }
+    const {Name,
+  AboutMe,
+  workExperience,
+  education,
+  Linkedin,
+  twitter} = req.body
+    try{
+        if(!req.file) {
+            return res.status(400).json({message:"No company logo"})
+        }
+        const Image = await CloudinaryUpload(req.file); 
+
+        const response = await User.findOneAndUpdate({firebaseUid:uid},{Name:Name,AboutMe:AboutMe,workExperience:workExperience,education:education,Linkedin:Linkedin,twitter:twitter,Profile:Image})
+        if(!response){
+            return res.status(500).json({message:"internal server error"});
+        }
+        
+        return res.status(200).json({message:"profile edited"});
+    }catch(error){
+        return res.status(500).json({message:"internal server error"});
+    }
+
+
+
+}

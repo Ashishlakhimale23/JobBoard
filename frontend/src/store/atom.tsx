@@ -1,4 +1,5 @@
-import { CreateApplications } from "@/types/type"
+import { CreateApplications, Education, workexperience } from "@/types/type"
+import { UsersProfile } from "@/types/type";
 import {atom} from "recoil"
 //Defaults
 export const CreateApplicationDefault: CreateApplications = {
@@ -26,6 +27,42 @@ export const CreateApplicationDefault: CreateApplications = {
 }; 
 
 
+export const workExperienceDefault:workexperience= {
+  Role:"",
+  Location:"",
+  CompanyName:"",
+  JoiningYear:"",
+  LeavingYear:"",
+  AboutJob:{
+    type: "doc",
+    content: [],
+  },
+}
+
+export const educationdefault :Education={
+  CourseName:"",
+  UniLocation:"",
+  UniversityName:"",
+  StartYear:"",
+  EndYear:"",
+  AboutCourse:{
+    type: "doc",
+    content: [],
+  },
+}
+export const UserProfileDefault:UsersProfile={
+  Name:'',
+  Profile:"",
+  AboutMe:{
+    type: "doc",
+    content: [],
+  },
+  skills:[""],
+  workExperience:[workExperienceDefault],
+  education:[educationdefault],
+  Linkedin:"",
+  twitter:""
+}
 
 //atoms
 export const LoggedState = atom<boolean>({
@@ -38,5 +75,13 @@ export const Application = atom<CreateApplications>({
    default:(()=>{
       const saved = localStorage.getItem("application");
       return saved ? JSON.parse(saved) : CreateApplicationDefault;
+   })()
+})
+
+export const UserProfile = atom<UsersProfile>({
+   key:"UserProfile",
+   default:(()=>{
+      const saved = localStorage.getItem("userprofile");
+      return saved ? JSON.parse(saved) : UserProfileDefault;
    })()
 })

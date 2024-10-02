@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select"
 import { useRecoilState } from "recoil";
 import { JSONContent } from "@tiptap/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import zod, {  ZodType } from "zod"
 import { CreateApplications, CustomAxiosError} from "@/types/type";
 import toast from "react-hot-toast";

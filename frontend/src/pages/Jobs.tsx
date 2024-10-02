@@ -55,7 +55,7 @@ const debouncedSearch = useCallback(
   );
 
   useEffect(() => {
-    debouncedSearch(search);
+    debouncedSearch(search.trim());
     console.log(allApplications)
     return () => {
       debouncedSearch.cancel();

@@ -1,10 +1,10 @@
 /* Custom Editor Styles */
 .editor-content {
   /* Set a base font size */
-  font-size: 16px;
+  font-size: 17px;
   /* Adjust overall text color */
   color: #ffffff !important;
-  line-height: 1.5 !important;
+  line-height: 1.7 !important;
 }
 
 .editor-content h1,

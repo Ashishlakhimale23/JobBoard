@@ -36,7 +36,7 @@ export function JobInfo(){
     return (
       <>
         <div className="sm:max-w-4xl sm:mx-auto space-y-4 p-3">
-          <header className=" ">
+          <header className="space-y-4 pb-6">
             <div className="rounded-2xl  antialiased">
               <div className="space-y-4">
                 <div className="flex justify-center">
@@ -67,11 +67,12 @@ export function JobInfo(){
                 </div>
               </div>
             </div>
-          </header>
-
-          <div className="flex justify-center">
+<div className="flex justify-center">
             <button className="text-black font-semibold px-4 py-2 rounded-full bg-white ">Apply for this job</button>
           </div>
+          </header>
+
+          
 
           <div>
             <div>

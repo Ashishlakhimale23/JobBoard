@@ -10,14 +10,36 @@ const user = new mongoose.Schema({
     },
     firebaseUid:{
         type:String,
-        required:true },
+        required:true 
+    },
+    Name:{
+        type:String,
+    },
+    Profile:{
+        type:String,
+    },
+    Linkedin:{
+        type:String,
+    },
+    twitter:{
+        type:String,
+    },
+    AboutMe:{
+        type:[{}]
+    },
+    workExperience:{
+        type:[{}]
+    },
+    education:{
+        type:[{}]
+    },
     JobUploaded:[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"space"
+        ref:"Applicant"
     }],
     Application:[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"space"
+        ref:"Applicant"
     }],
     },{
     timestamps:true
