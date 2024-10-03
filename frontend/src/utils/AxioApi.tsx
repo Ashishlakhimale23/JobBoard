@@ -45,10 +45,11 @@ const concurrencyInstance = new Concurrency();
 
 const refreshToken = async () => {
   const user = auth.currentUser;
-  const idToken: string = await user?.getIdToken(true)!;
-
-  localStorage.setItem("AccessToken", idToken);
+  console.log(user)
+  let  idToken: string | undefined = await user?.getIdToken(true)!;
+  localStorage.setItem("AccessToken",idToken);
   return idToken;
+
 };
 
 api.interceptors.request.use(

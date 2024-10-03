@@ -2,6 +2,8 @@ import { HomeJobCard } from "../components/HomeJobCard"
 import { api } from "@/utils/AxioApi";
 import { useState,useEffect,useCallback } from "react";
 import debounce from "lodash.debounce"
+import { useRecoilState } from "recoil";
+import { UserProfile } from "@/store/atom";
 
 export function Jobs(){
   
@@ -28,13 +30,14 @@ enum Jobs {
   const [allApplications, setAllApplications] = useState<JobApplication[]>([]);
   const [selectedJobType, setSelectedJobType] = useState<Jobs>(Jobs.jobs);
   const [searchpost,setSearchpost] = useState<JobApplication[]>([])
+  const [userProfile,setUserProfile] = useRecoilState(UserProfile)
 
-  const getAllApplications = async (jobType: Jobs): Promise<JobApplication[]> => {
+  const getAllApplications = async (jobType: Jobs): Promise<{Data:JobApplication[],Profile:{Profile:string,username:string}}> => {
     try {
       const response = await api.get(`/applicant/getallapplication${jobType}`);
-      return response.data.Data;
+      return response.data;
     } catch (error) {
-      return [];
+      return {Data:[],Profile:{Profile:"",username:""}};
     }
   };
 
@@ -65,12 +68,13 @@ const debouncedSearch = useCallback(
   useEffect(() => {
     const fetchApplications = async () => {
       const result = await getAllApplications(selectedJobType);
-      setAllApplications(result);
+      setAllApplications(result.Data);
+      setUserProfile((prev)=>({...prev,Profile:result.Profile.Profile,Name:result.Profile.username}))
+      localStorage.setItem("userprofile",JSON.stringify(userProfile))
     };
     fetchApplications();
   }, [selectedJobType]);
 
-    
   return (
     <>
       <div className=" text-white w-full min-h-screen px-4 mx-auto pb-8 max-w-7xl">

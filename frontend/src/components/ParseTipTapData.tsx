@@ -6,8 +6,7 @@ import BulletList from '@tiptap/extension-bullet-list';
 import Link from '@tiptap/extension-link';
 
 export const TiptapEditor = ({ initialContent }: { initialContent: any }) => {
-  console.log('Initial content:', initialContent);
-
+  console.log(initialContent)
   const defaultContent = {
     type: "doc",
     content: [
@@ -55,7 +54,7 @@ export const TiptapEditor = ({ initialContent }: { initialContent: any }) => {
     content, // Content assigned here
     editorProps: {
       attributes: {
-        class: 'focus:outline-none editor-content max-w-full rounded-lg p-4 ',
+        class: 'focus:outline-none editor-content max-w-full rounded-lg ',
       },
     },
     editable: false, // Set to false for read-only

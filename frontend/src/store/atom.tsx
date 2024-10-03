@@ -85,3 +85,9 @@ export const UserProfile = atom<UsersProfile>({
       return saved ? JSON.parse(saved) : UserProfileDefault;
    })()
 })
+
+export const SettingsModal = atom<boolean>({
+  key:'SettingsModal',
+  default:false
+  
+})

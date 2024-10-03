@@ -75,17 +75,23 @@ export function JobInfo(){
           
 
           <div>
-            <div>
+            <div >
                 <p className="font-semibold text-white text-xl">Overview</p>
+                <div className="p-4">
                 <TiptapEditor initialContent={job.CompanyOverview} />
+</div>
             </div>
             <div>
                 <p className="font-semibold text-white text-xl">Responsibilities</p>
+                <div className="p-4">
                 <TiptapEditor initialContent={job.Responsibilities} />
+</div>
             </div>
             <div>
                 <p className="font-semibold text-white text-xl">Qualification</p>
+                <div className="p-4">
                 <TiptapEditor initialContent={job.Qualification} />
+</div>
             </div>
           </div>
         </div>

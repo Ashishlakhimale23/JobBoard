@@ -87,7 +87,7 @@ export function ProfileInfo(){
       zod
         .instanceof(File)
         .refine(
-          (file) => !file || file.size <= 1024 * 1024 * 3, // 3MB limit
+          (file) => !file || file.size <= 1024 * 1024 * 3, 
           { message: "File size must be less than 3MB" }
         )
         .refine(
@@ -171,14 +171,14 @@ const VerifyZodObject = (data: any) => {
 
   const updateAboutmeEducation=(content:JSONContent)=>{
     const len = education.length - 1;
-    const work = {...education[len],AboutJob:content}
+    const work = {...education[len],AboutCourse:content}
     const array = [...education.slice(0,len),work]
     setUserprofile((prev)=>({...prev,education:array}))
   }
 
 const updateAboutmeExperience=(content:JSONContent)=>{
     const len = workExperience.length - 1;
-    const work = {...workExperience[len],AboutCourse:content}
+    const work = {...workExperience[len],AboutJob:content}
     const array = [...workExperience.slice(0,len),work]
     setUserprofile((prev)=>({...prev,workExperience:array}))
   }
