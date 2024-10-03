@@ -62,12 +62,11 @@ export const CreateApplication =async (req:Request,res:Response)=>{
 
 
 export const GetAllApplications=async(req:Request,res:Response)=>{
+    const uid = req.uid;
     try{
+        const profile = await User.findOne({firebaseUid:uid}).select('Profile username');
         const response = await Application.find().select("JobTitle WorkMode Location Type AverageSalary CompanyLogo JobLink");
-        if(!response.length){
-            return res.status(404).json({ message: 'No applications found' });
-        }
-        return res.status(200).json({Data:response});
+        return res.status(200).json({Data:response,Profile:profile});
     }catch(error){
         return res.status(500).json({message:'internal error'})
     }
@@ -173,6 +172,22 @@ export const EditProfile=async(req:Request,res:Response)=>{
         return res.status(500).json({message:"internal server error"});
     }
 
+}
 
-
+export const GetUserData=async(req:Request,res:Response)=>{
+    const uid = req.uid;
+    const username = req.query.username;
+    if(!username){
+        return res.status(400).json({message:"username not provided"});
+    }
+    try{
+        const response = await User.findOne({username:username})
+        if(!response){
+            return res.status(500).json({message:"internal server error"})
+        }
+        return res.status(200).json({Data:response});
+        
+    }catch(error){
+        return res.status(500).json({message:"internal server error"})
+    }
 }

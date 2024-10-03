@@ -1,3 +1,4 @@
+import { required } from "joi";
 import mongoose from "mongoose";
 const user = new mongoose.Schema({
     email:{
@@ -6,7 +7,8 @@ const user = new mongoose.Schema({
         unique:true
     },
     username:{
-        type:String
+        type:String,
+        required:true,
     },
     firebaseUid:{
         type:String,
@@ -17,6 +19,7 @@ const user = new mongoose.Schema({
     },
     Profile:{
         type:String,
+        default:"https://res.cloudinary.com/ddweepkue/image/upload/v1724660793/q2bq6n1v3xggakyprama.jpg",
     },
     Linkedin:{
         type:String,

@@ -2,6 +2,7 @@ import { Request,Response } from "express"
 import { User } from "../Models/user"
 import {config} from "dotenv"
 import admin from "../Utils/firebaseadmin" 
+import { RemoveAnySpaces } from "../Utils/RemoveSpaces"
 config()
 
 export const handlesignin = async(req:Request<{},{},{idtoken:string,username:string}>,res:Response)=>{
@@ -20,7 +21,7 @@ export const handlesignin = async(req:Request<{},{},{idtoken:string,username:str
         const Newuser = new User({
             email:idtoken.email,
             firebaseUid:idtoken.uid,
-            username:username
+            username:RemoveAnySpaces(username)
         })
          await Newuser.save().then(()=>{
             return res.status(200).json({message:"created account"})
