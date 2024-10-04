@@ -86,7 +86,7 @@ const debouncedSearch = useCallback(
             <input
               type="text"
               placeholder="Search by title."
-              className="outline-none w-full lg:max-w-2xl text-white rounded-xl py-6 px-2 placeholder:text-white bg-neutral-900/90 focus:ring-2 focus:ring-white "
+              className="outline-none w-full lg:max-w-2xl text-white rounded-xl py-6 px-2 placeholder:text-white placeholder:font-semibold bg-neutral-900/90 focus:ring-2 focus:ring-white "
               value={search}
               onChange={(e)=>setSearch(e.target.value)}
             />
@@ -138,9 +138,14 @@ const debouncedSearch = useCallback(
         <div className="space-y-2">
 
           {
-            !search.length ? allApplications.map((app,index)=>(
-           <HomeJobCard
-           key={index}
+  !allApplications.length ? (
+    <div className="rounded-2xl bg-zinc-950/85 sm:flex sm:justify-center text-lg font-semibold space-y-4 sm:space-y-0  px-4 py-6  hover:bg-neutral-900/90 transition-colors duration-300 antialiased ">{selectedJobType ==="jobs" || selectedJobType === "internship" ?`No ${selectedJobType} available`:`No ${selectedJobType} jobs available`}</div>
+  ) : (
+    <>
+      {!search.length ? (
+        allApplications.map((app, index) => (
+          <HomeJobCard
+            key={index}
             Type={app.Type}
             JobTitle={app.JobTitle}
             AverageSalary={app.AverageSalary}
@@ -149,13 +154,11 @@ const debouncedSearch = useCallback(
             CompanyLogo={app.CompanyLogo}
             JobLink={app.JobLink}
           />
-            ))
-
-            :
-
-          searchpost.map((app,index)=>(
-           <HomeJobCard
-           key={index}
+        ))
+      ) : (
+        searchpost.map((app, index) => (
+          <HomeJobCard
+            key={index}
             Type={app.Type}
             JobLink={app.JobLink}
             JobTitle={app.JobTitle}
@@ -164,11 +167,12 @@ const debouncedSearch = useCallback(
             WorkMode={app.WorkMode}
             CompanyLogo={app.CompanyLogo}
           />
-            ))
+        ))
+      )}
+    </>
+  )
+}
 
-
-          }
-          
           
         </div>
       </div>

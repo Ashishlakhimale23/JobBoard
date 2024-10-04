@@ -14,6 +14,7 @@ import zod, {  ZodType } from "zod"
 import { CreateApplications, CustomAxiosError} from "@/types/type";
 import toast from "react-hot-toast";
 import { api } from "@/utils/AxioApi";
+import { useNavigate } from "react-router-dom";
 
 export function CreateApplication(){
   
@@ -33,6 +34,8 @@ export function CreateApplication(){
     CompanyOverview,
     CompanyLogo,
   } = createApplication;
+
+  const navigate = useNavigate()
 
   const handleInputChange = (
     field: keyof typeof createApplication,
@@ -164,7 +167,8 @@ const VerifyZodObject = (data: any) => {
         }
       );
       setCreateApplication(CreateApplicationDefault)
-      return toast.success(response.data.message);
+      toast.success(response.data.message);
+      navigate(`/job/${createApplication.JobTitle}`)
     } catch (error) {
       if (error) {
         const axiosError = error as CustomAxiosError;

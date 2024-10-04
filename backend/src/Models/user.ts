@@ -27,6 +27,9 @@ const user = new mongoose.Schema({
     twitter:{
         type:String,
     },
+    skills:{
+        type:[String],
+    },
     AboutMe:{
         type:[{}]
     },

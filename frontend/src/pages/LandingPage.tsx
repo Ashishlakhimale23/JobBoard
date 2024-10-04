@@ -3,13 +3,9 @@ import { GoogleAuthProvider,signInWithPopup } from "firebase/auth";
 import {auth} from "../utils/FirebaseAuth"
 import {toast} from "react-hot-toast"
 import axios from "axios";
-import { LoggedState } from "../store/atom";
-import { useRecoilState } from "recoil";
 import { JobCard } from "@/components/JobCard";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 export function Home() {
-  const [logged, setLogged] = useRecoilState<boolean>(LoggedState);
   const navigate = useNavigate()
 
   const handlegooglesubmit = async () => {
@@ -28,7 +24,7 @@ export function Home() {
 
       if (Object.values(response.data).includes("Logged in")) {
         localStorage.setItem("AccessToken", idtoken);
-        setLogged(true);
+        navigate("/jobs") 
       } else {
         toast.error(response.data.message);
       }
@@ -74,7 +70,7 @@ export function Home() {
 
       if (Object.values(response.data).includes("created account")) {
         localStorage.setItem("AccessToken",idToken);
-        setLogged(true);
+        navigate("/jobs") 
       } else {
         return toast.error(response.data.message);
       }
@@ -100,11 +96,7 @@ export function Home() {
   };
 
 
-  useEffect(()=>{
-    navigate('/jobs')
-    
-
-  },[logged])
+  
 return (
    <div className=" min-h-screen w-full bg-black overflow-hidden">
   

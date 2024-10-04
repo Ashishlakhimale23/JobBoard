@@ -153,19 +153,25 @@ export const EditProfile=async(req:Request,res:Response)=>{
     const {Name,
   AboutMe,
   workExperience,
+  Profile,
   education,
   Linkedin,
-  twitter} = req.body
+  twitter,skills} = req.body
     try{
-        if(!req.file) {
-            return res.status(400).json({message:"No company logo"})
-        }
-        const Image = await CloudinaryUpload(req.file); 
-
-        const response = await User.findOneAndUpdate({firebaseUid:uid},{Name:Name,AboutMe:AboutMe,workExperience:workExperience,education:education,Linkedin:Linkedin,twitter:twitter,Profile:Image})
+         let Image
+        if(req.file) {
+           Image = await CloudinaryUpload(req.file); 
+        const response = await User.findOneAndUpdate({firebaseUid:uid},{Name:Name,AboutMe:AboutMe,workExperience:workExperience,education:education,Linkedin:Linkedin,twitter:twitter,Profile:Image,skills:skills})
         if(!response){
             return res.status(500).json({message:"internal server error"});
         }
+        }
+        const response = await User.findOneAndUpdate({firebaseUid:uid},{Name:Name,AboutMe:AboutMe,workExperience:workExperience,education:education,Linkedin:Linkedin,twitter:twitter,Profile:Profile,skills:skills})
+        if(!response){
+            return res.status(500).json({message:"internal server error"});
+        }
+
+        
         
         return res.status(200).json({message:"profile edited"});
     }catch(error){
@@ -177,15 +183,19 @@ export const EditProfile=async(req:Request,res:Response)=>{
 export const GetUserData=async(req:Request,res:Response)=>{
     const uid = req.uid;
     const username = req.query.username;
+    let admin=false;
     if(!username){
         return res.status(400).json({message:"username not provided"});
     }
     try{
         const response = await User.findOne({username:username})
+        if(uid === response?.firebaseUid){
+            admin =true
+        }
         if(!response){
             return res.status(500).json({message:"internal server error"})
         }
-        return res.status(200).json({Data:response});
+        return res.status(200).json({Data:response,admin:admin});
         
     }catch(error){
         return res.status(500).json({message:"internal server error"})

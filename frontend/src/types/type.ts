@@ -40,7 +40,7 @@ export interface Education{
 export interface UsersProfile{
   Name:string,
   AboutMe:JSONContent,
-  skills:[string],
+  skills:string[],
   Profile:string | File,
   workExperience:workexperience[],
   education:Education[]

@@ -2,15 +2,19 @@ import {  educationdefault, UserProfile, UserProfileDefault, workExperienceDefau
 import {TextEditor} from "./TextEditor"
 import { useRecoilState } from "recoil";
 import { JSONContent } from "@tiptap/react";
-import { useEffect} from "react";
+import { useEffect, useState} from "react";
 import { CustomAxiosError, UsersProfile} from "@/types/type";
 import toast from "react-hot-toast";
 import { api } from "@/utils/AxioApi";
 import zod from "zod"
+import { useNavigate } from "react-router-dom";
+import techStack from "@/utils/suggestions";
 
 export function ProfileInfo(){
   const [userprofile, setUserprofile] = useRecoilState(UserProfile);
-  const {
+  const [skill,setSkill] = useState<string>("");
+   const [predicated, setPredicated] = useState<string[]>([]);
+  let {
     Name,
     Profile,
     AboutMe,
@@ -20,6 +24,7 @@ export function ProfileInfo(){
     workExperience,
     education,
   } = userprofile;
+  const navigate =useNavigate() 
 
   const handleInputChange = (field: keyof typeof userprofile, value: any) => {
     setUserprofile((prev) => ({
@@ -110,9 +115,6 @@ const VerifyZodObject = (data: any) => {
     if (!Name) {
       return toast.error("Fill the field Job title.");
     }
-    if (!Profile) {
-      return toast.error("Fill the field.");
-    }
     if (!AboutMe) {
       return toast.error("Fill the field.");
     }
@@ -141,7 +143,9 @@ const VerifyZodObject = (data: any) => {
         }
       );
       setUserprofile(UserProfileDefault);
-      return toast.success(response.data.message);
+      toast.success(response.data.message);
+      navigate(`/${userprofile.Name}`)
+      
     } catch (error) {
       if (error) {
         const axiosError = error as CustomAxiosError;
@@ -182,6 +186,51 @@ const updateAboutmeExperience=(content:JSONContent)=>{
     const array = [...workExperience.slice(0,len),work]
     setUserprofile((prev)=>({...prev,workExperience:array}))
   }
+
+
+const getpredicatedvalue = (value:string) => {
+    const flitered = techStack.filter(
+      (item:string) => item.toLowerCase().indexOf(value.toLowerCase()) !== -1
+    );
+    console.log(flitered)
+    setPredicated(flitered.slice(0,5));
+  };
+
+  const handletechstack = (e:any) => {
+    setSkill(e.target.value);
+    getpredicatedvalue(e.target.value);
+  };
+
+  const handleOnClickOnTechstack = (e:any) => {
+   
+      setUserprofile((prevInfo) => ({
+        ...prevInfo,
+        skills: [...skills, e.target.innerText],
+      }));
+      console.log(userprofile,skills)
+      setSkill("");
+    
+
+  };
+
+  const handleOnClickDeleteTech = (e:any) => {
+    const updatedarray = skills.filter(
+      (item:string) => item != e.currentTarget.parentElement.firstChild.innerText
+    );
+    setUserprofile((prevInfo) => ({ ...prevInfo, skills: updatedarray }));
+  };
+
+  const handleKeyDownTechstack = (e:any) => {
+    if (e.code == "Enter" ) {
+      
+         setUserprofile((prevInfo) => ({
+       ...prevInfo,
+       skills: prevInfo.skills ? [...prevInfo.skills, e.target.value] : [e.target.value]
+   }));
+      setSkill("");
+    }
+  };
+
   return (
     <>
       <div className="min-h-screen bg-black">
@@ -228,6 +277,57 @@ const updateAboutmeExperience=(content:JSONContent)=>{
                     handleInputChange("Profile",file);
                   }}
                 />
+              </div>
+
+              <div className="relative">
+                 <label className="font-bold block text-lg">Tech Stack</label>
+                <input
+
+                  className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2  focus:ring-blue-500 transition "
+                  placeholder="Search for technologies, topics,more..."
+                  value={skill}
+                  onChange={handletechstack}
+                  onKeyDown={handleKeyDownTechstack}
+                />
+                <div className={`${!skill.length || !predicated.length?'hidden':'bg-neutral-800 gap-2 mt-2 absolute h-fit rounded-md space-y-2 py-2 z-10 w-full'}`}>
+                  {!skill.length || !predicated.length
+                    ? null
+                    :predicated.map((tech, index) => (
+                        <div
+                          key={index}
+                          className=" hover:bg-white  cursor-pointer hover:text-black rounded-sm mx-2  px-4 py-1"
+                          onClick={handleOnClickOnTechstack}
+                        >{tech}</div>
+                      ))}
+                </div>
+
+                <div className="flex flex-wrap mt-2 gap-1">
+                  {!skills
+                    ? null
+                    : skills.map((tech, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center bg-zinc-800 px-2 py-1 cursor-pointer rounded-2xl  "
+                        >
+                          <p>{tech} </p>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="1.5"
+                            stroke="currentColor"
+                            className="h-5 ml-1 "
+                            onClick={handleOnClickDeleteTech}
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M6 18 18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </div>
+                      ))}
+                </div>
               </div>
 
               <div>

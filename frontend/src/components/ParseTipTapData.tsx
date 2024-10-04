@@ -6,7 +6,6 @@ import BulletList from '@tiptap/extension-bullet-list';
 import Link from '@tiptap/extension-link';
 
 export const TiptapEditor = ({ initialContent }: { initialContent: any }) => {
-  console.log(initialContent)
   const defaultContent = {
     type: "doc",
     content: [

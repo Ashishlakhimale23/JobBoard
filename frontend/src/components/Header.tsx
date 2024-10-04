@@ -1,13 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { LoggedState, SettingsModal, UserProfile } from "@/store/atom";
+import {  SettingsModal, UserProfile } from "@/store/atom";
 import { useRef,useEffect } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue} from "recoil";
 export function Header(){
   const navigate = useNavigate();
   const imgRef = useRef<HTMLImageElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const [settingsModal, setSettingsModal] = useRecoilState(SettingsModal);
-  const setLoggedState = useSetRecoilState(LoggedState)
   const {Profile,Name} = useRecoilValue(UserProfile)
 
   useEffect(() => {
@@ -106,7 +105,6 @@ export function Header(){
               className="px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left font-semibold"
               onClick={() => {
                 setSettingsModal(false);
-                setLoggedState(false)
                 localStorage.removeItem("AccessToken");
                 localStorage.removeItem("application");
                 window.location.href = "/";

@@ -57,7 +57,7 @@ export const UserProfileDefault:UsersProfile={
     type: "doc",
     content: [],
   },
-  skills:[""],
+  skills:[],
   workExperience:[workExperienceDefault],
   education:[educationdefault],
   Linkedin:"",
