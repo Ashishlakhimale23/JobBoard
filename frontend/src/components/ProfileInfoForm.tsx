@@ -1,4 +1,4 @@
-import {  educationdefault, UserProfile, UserProfileDefault, workExperienceDefault} from "@/store/atom";
+import {  educationdefault, projectdefault, UserProfile, UserProfileDefault, workExperienceDefault} from "@/store/atom";
 import {TextEditor} from "./TextEditor"
 import { useRecoilState } from "recoil";
 import { JSONContent } from "@tiptap/react";
@@ -17,15 +17,49 @@ export function ProfileInfo(){
   let {
     Name,
     Profile,
+    Protfolio,
     AboutMe,
     skills,
     Linkedin,
     twitter,
     workExperience,
     education,
+    Projects
   } = userprofile;
   const navigate =useNavigate() 
 
+  useEffect(()=>{
+
+    const fetchuser=async()=>{
+
+    let userdata = localStorage.getItem("userprofile") 
+    console.log(userdata)
+    let userdataparsed = userdata ? JSON.parse(userdata) : null 
+    if(userdataparsed === null){
+      const result= await api.get("/applicant/getuser");
+    const updatedProfile = {
+      ...result.data.Data,
+      AboutMe: result.data.Data.AboutMe.length
+        ? JSON.parse(result.data.Data.AboutMe[0])
+        : result.data.Data.AboutMe,
+      skills: result.data.Data.skills.length
+        ? JSON.parse(result.data.Data.skills[0])
+        : result.data.Data.skills,
+      workExperience: result.data.Data.workExperience.length
+        ? JSON.parse(result.data.Data.workExperience[0].toString())
+        : result.data.Data.workExperience,
+      education: result.data.Data.education.length
+        ? JSON.parse(result.data.Data.education[0].toString())
+        : result.data.Data.education,
+    };
+    setUserprofile(updatedProfile);
+    }else{
+    setUserprofile(userdataparsed);
+    }
+    }
+    fetchuser();
+    console.log(userprofile)
+  },[])
   const handleInputChange = (field: keyof typeof userprofile, value: any) => {
     setUserprofile((prev) => ({
       ...prev,
@@ -45,7 +79,14 @@ export function ProfileInfo(){
     const work = {...education[len],[field]:value}
     const array = [...education.slice(0,len),work]
     setUserprofile((prev)=>({...prev,education:array}))
-  }
+ }
+
+const handleProjectChanges=(field:keyof typeof projectdefault,value:string)=>{
+    const len = Projects.length - 1;
+    const work = {...Projects[len],[field]:value}
+    const array = [...Projects.slice(0,len),work]
+    setUserprofile((prev)=>({...prev,Projects:array}))
+ }
 
   const handleAddEducation = () => {
     const array = [...education,educationdefault];
@@ -55,6 +96,11 @@ export function ProfileInfo(){
   const handleAddWork = () => {
     const array = [...workExperience, workExperienceDefault];
     setUserprofile((prev) => ({ ...prev, workExperience: array }));
+  };
+
+ const handleAddProject= () => {
+    const array = [...Projects,projectdefault];
+    setUserprofile((prev) => ({ ...prev,Projects: array }));
   };
 
   const CreateFormData = () => {
@@ -116,13 +162,13 @@ const VerifyZodObject = (data: any) => {
       return toast.error("Fill the field Job title.");
     }
     if (!AboutMe) {
-      return toast.error("Fill the field.");
+      return toast.error("Fill the field Aboutme.");
     }
     if (!Linkedin) {
-      return toast.error("Fill the field company name.");
+      return toast.error("Fill the field Linkedin url.");
     }
     if (!twitter) {
-      return toast.error("Fill the field company email.");
+      return toast.error("Fill the field twitter url.");
     }
 
      const ParsedResult = VerifyZodObject(userprofile);
@@ -165,10 +211,6 @@ const VerifyZodObject = (data: any) => {
     }
   };
 
-  useEffect(() => {
-    localStorage.setItem("application", JSON.stringify(userprofile));
-  }, [handleInputChange]);
-
   const updateAboutme = (content: JSONContent) => {
     setUserprofile((prev) => ({ ...prev, AboutMe: content }));
   };
@@ -180,13 +222,20 @@ const VerifyZodObject = (data: any) => {
     setUserprofile((prev)=>({...prev,education:array}))
   }
 
-const updateAboutmeExperience=(content:JSONContent)=>{
+
+  const updateAboutmeExperience=(content:JSONContent)=>{
     const len = workExperience.length - 1;
     const work = {...workExperience[len],AboutJob:content}
     const array = [...workExperience.slice(0,len),work]
     setUserprofile((prev)=>({...prev,workExperience:array}))
   }
 
+  const updateAboutmeProject=(content:JSONContent)=>{
+    const len = Projects.length - 1;
+    const work = {...Projects[len],AboutProject:content}
+    const array = [...Projects.slice(0,len),work]
+    setUserprofile((prev)=>({...prev,Projects:array}))
+  }
 
 const getpredicatedvalue = (value:string) => {
     const flitered = techStack.filter(
@@ -202,15 +251,13 @@ const getpredicatedvalue = (value:string) => {
   };
 
   const handleOnClickOnTechstack = (e:any) => {
-   
-      setUserprofile((prevInfo) => ({
-        ...prevInfo,
-        skills: [...skills, e.target.innerText],
-      }));
-      console.log(userprofile,skills)
-      setSkill("");
     
-
+    setUserprofile((prevInfo) => ({
+       ...prevInfo,
+       skills: prevInfo.skills ? [...prevInfo.skills, e.target.innerText] : [e.target.innerText]
+   }))
+   
+      setSkill("");
   };
 
   const handleOnClickDeleteTech = (e:any) => {
@@ -221,7 +268,7 @@ const getpredicatedvalue = (value:string) => {
   };
 
   const handleKeyDownTechstack = (e:any) => {
-    if (e.code == "Enter" ) {
+    if (e.code == "Enter" && skill.length  ) {
       
          setUserprofile((prevInfo) => ({
        ...prevInfo,
@@ -230,6 +277,7 @@ const getpredicatedvalue = (value:string) => {
       setSkill("");
     }
   };
+    
 
   return (
     <>
@@ -280,9 +328,9 @@ const getpredicatedvalue = (value:string) => {
               </div>
 
               <div className="relative">
-                 <label className="font-bold block text-lg">Tech Stack</label>
+                 <label htmlFor="Skills" className="font-medium block text-sm text-gray-300 mb-1">Skills</label>
                 <input
-
+                  id="Skills"
                   className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2  focus:ring-blue-500 transition "
                   placeholder="Search for technologies, topics,more..."
                   value={skill}
@@ -368,6 +416,22 @@ const getpredicatedvalue = (value:string) => {
                   value={twitter}
                   autoComplete="off"
                   onChange={(e) => handleInputChange("twitter",e.target.value)}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="Portfolio"
+                  className="block text-sm font-medium text-gray-300 mb-1"
+                >
+                  Portfolio
+                </label>
+                <input
+                  id="Portfolio"
+                  type="text"
+                  className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  value={Protfolio}
+                  autoComplete="off"
+                  onChange={(e) => handleInputChange("Protfolio",e.target.value)}
                 />
               </div>
             </div>
@@ -613,6 +677,89 @@ const getpredicatedvalue = (value:string) => {
                 onClick={handleAddEducation}
               >
                 Add Education
+              </button>
+            </div>
+
+            <h2 className="text-xl font-semibold text-white">Projects</h2>
+            <div className="space-y-4">
+              {Projects.map((edu, index) => (
+                <>
+                  <div key={index}>
+                    <label
+                      htmlFor="ProjectTitle"
+                      className="block text-sm font-medium text-gray-300 mb-1"
+                    >
+                     Project Name 
+                    </label>
+                    <input
+                      id="ProjectTitle"
+                      autoComplete="off"
+                      type="text"
+                      className="w-full appearance-none bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      value={edu.Title}
+                      onChange={(e) =>
+                        handleProjectChanges("Title",e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div >
+                    <label
+                      htmlFor="ProjectGithublink"
+                      className="block text-sm font-medium text-gray-300 mb-1"
+                    >
+                    Github Link 
+                    </label>
+                    <input
+                      id="ProjectGithublink"
+                      autoComplete="off"
+                      type="text"
+                      className="w-full appearance-none bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      value={edu.GithubLink}
+                      onChange={(e) =>
+                        handleProjectChanges("GithubLink",e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div >
+                    <label
+                      htmlFor="ProjectLiveLink"
+                      className="block text-sm font-medium text-gray-300 mb-1"
+                    >
+                    Live Link 
+                    </label>
+                    <input
+                      id="ProjectLiveLink"
+                      autoComplete="off"
+                      type="text"
+                      className="w-full appearance-none bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      value={edu.LiveLink as string}
+                      onChange={(e) =>
+                        handleProjectChanges("LiveLink",e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-semibold text-gray-300">
+                      About Project  
+                    </label>
+                    <TextEditor
+                      initialContent={edu.AboutProject}
+                      onUpdate={updateAboutmeProject}
+                    />
+                  </div>
+                </>
+              ))}
+            </div>
+            <div className="flex justify-start">
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition"
+                onClick={handleAddProject}
+              >
+                Add Project 
               </button>
             </div>
 

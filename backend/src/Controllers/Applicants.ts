@@ -64,7 +64,7 @@ export const CreateApplication =async (req:Request,res:Response)=>{
 export const GetAllApplications=async(req:Request,res:Response)=>{
     const uid = req.uid;
     try{
-        const profile = await User.findOne({firebaseUid:uid}).select('Profile username');
+        const profile = await User.findOne({firebaseUid:uid}).select('Profile Name');
         const response = await Application.find().select("JobTitle WorkMode Location Type AverageSalary CompanyLogo JobLink");
         return res.status(200).json({Data:response,Profile:profile});
     }catch(error){
@@ -156,17 +156,18 @@ export const EditProfile=async(req:Request,res:Response)=>{
   Profile,
   education,
   Linkedin,
-  twitter,skills} = req.body
+  twitter,skills,
+Portfolio} = req.body
     try{
          let Image
         if(req.file) {
            Image = await CloudinaryUpload(req.file); 
-        const response = await User.findOneAndUpdate({firebaseUid:uid},{Name:Name,AboutMe:AboutMe,workExperience:workExperience,education:education,Linkedin:Linkedin,twitter:twitter,Profile:Image,skills:skills})
+        const response = await User.findOneAndUpdate({firebaseUid:uid},{Name:Name,AboutMe:AboutMe,workExperience:workExperience,education:education,Linkedin:Linkedin,twitter:twitter,Profile:Image,skills:skills,Portfolio:Portfolio})
         if(!response){
             return res.status(500).json({message:"internal server error"});
         }
         }
-        const response = await User.findOneAndUpdate({firebaseUid:uid},{Name:Name,AboutMe:AboutMe,workExperience:workExperience,education:education,Linkedin:Linkedin,twitter:twitter,Profile:Profile,skills:skills})
+        const response = await User.findOneAndUpdate({firebaseUid:uid},{Name:Name,AboutMe:AboutMe,workExperience:workExperience,education:education,Linkedin:Linkedin,twitter:twitter,Profile:Profile,skills:skills,Portfolio:Portfolio})
         if(!response){
             return res.status(500).json({message:"internal server error"});
         }
@@ -188,7 +189,7 @@ export const GetUserData=async(req:Request,res:Response)=>{
         return res.status(400).json({message:"username not provided"});
     }
     try{
-        const response = await User.findOne({username:username})
+        const response = await User.findOne({Name:username})
         if(uid === response?.firebaseUid){
             admin =true
         }
@@ -196,6 +197,22 @@ export const GetUserData=async(req:Request,res:Response)=>{
             return res.status(500).json({message:"internal server error"})
         }
         return res.status(200).json({Data:response,admin:admin});
+        
+    }catch(error){
+        return res.status(500).json({message:"internal server error"})
+    }
+}
+
+export const GetUser=async(req:Request,res:Response)=>{
+    const uid = req.uid;
+    
+    try{
+
+        const response = await User.findOne({firebaseUid:uid});
+        if(!response){
+            return res.status(500).json({message:"internal server error"})
+        }
+        return res.status(200).json({Data:response});
         
     }catch(error){
         return res.status(500).json({message:"internal server error"})

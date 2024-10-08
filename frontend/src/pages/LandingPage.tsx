@@ -65,17 +65,18 @@ export function Home() {
 
       const response = await axios.post(`${process.env.BASE_URL}/user/signup`, {
         idtoken: idToken,
-        username: result.user.displayName,
       });
 
       if (Object.values(response.data).includes("created account")) {
         localStorage.setItem("AccessToken",idToken);
         navigate("/jobs") 
       } else {
+        console.log(response.data.message)
         return toast.error(response.data.message);
       }
     } catch (error: any) {
       const errorMessage = error.code;
+      console.log(errorMessage)
       switch (errorMessage) {
         case "auth/operation-not-supported-in-this-environment":
           toast.error("HTTP protocol is not supported. Please use HTTPS");

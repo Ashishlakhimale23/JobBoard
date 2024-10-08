@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import {  SettingsModal, UserProfile } from "@/store/atom";
-import { useRef,useEffect } from "react";
+import { useRef,useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue} from "recoil";
 export function Header(){
   const navigate = useNavigate();
   const imgRef = useRef<HTMLImageElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const [settingsModal, setSettingsModal] = useRecoilState(SettingsModal);
+  const [profile,setProfile] = useState<{Profile:string,Name:string}>({Profile:'',Name:""})
   const {Profile,Name} = useRecoilValue(UserProfile)
 
   useEffect(() => {
@@ -15,7 +16,17 @@ export function Header(){
     } else {
       document.body.removeEventListener("mousedown", settingmodal);
     }
+
+    
   }, [settingsModal, setSettingsModal, settingmodal]);
+
+  useEffect(()=>{
+    if(!Profile){
+    const profile = localStorage.getItem("profile")
+    profile ? setProfile(JSON.parse(profile)):null;
+    } 
+
+  },[])
 
   function settingmodal(e: MouseEvent) {
     if (imgRef.current !== null && modalRef.current !== null) {
@@ -53,7 +64,7 @@ export function Header(){
         </div>
         <div>
           <img
-            src={Profile as string}
+            src={!Profile ? profile.Profile :Profile as string }
             className="w-11 h-11 rounded-full hover:opacity-75 md:w-[50px] md:h-[50px]"
             ref={imgRef}
             onClick={() => {

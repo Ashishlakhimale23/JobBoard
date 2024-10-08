@@ -1,36 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import OrderedList from '@tiptap/extension-ordered-list';
 import BulletList from '@tiptap/extension-bullet-list';
 import Link from '@tiptap/extension-link';
 
-export const TiptapEditor = ({ initialContent }: { initialContent: any }) => {
-  const defaultContent = {
-    type: "doc",
-    content: [
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: "SkillSphere is a fast-growing technology company that specializes in delivering top-notch digital solutions."
-          }
-        ]
-      },
-      {
-        type: "paragraph",
-        content: [
-          {
-            type: "text",
-            text: "We are committed to innovation, teamwork, and delivering the best experience to our customers."
-          }
-        ]
-      },
-    ],
-  };
+const defaultContent = {
+  type: "doc",
+  content: [],
+};
 
-  const content = initialContent && initialContent.type === "doc" ? initialContent : defaultContent;
+export const TiptapEditor = ({ initialContent }: { initialContent: any }) => {
+  // Memoize the content to prevent unnecessary recalculations
+  const content = useMemo(() => {
+    return initialContent && initialContent.type === "doc" 
+      ? initialContent 
+      : defaultContent;
+  }, [initialContent]);
 
   const editor = useEditor({
     extensions: [
@@ -50,21 +36,21 @@ export const TiptapEditor = ({ initialContent }: { initialContent: any }) => {
         validate: (href) => /^https?:\/\//.test(href),
       }),
     ],
-    content, // Content assigned here
+    content,
     editorProps: {
       attributes: {
-        class: 'focus:outline-none editor-content max-w-full rounded-lg ',
+        class: 'focus:outline-none editor-content max-w-full rounded-lg',
       },
     },
-    editable: false, // Set to false for read-only
+    editable: false,
   });
 
+  // Only update content when initialContent changes
   useEffect(() => {
-    if (editor && content) {
-      
+    if (editor && initialContent !== editor.getJSON()) {
       editor.commands.setContent(content);
     }
-  }, [editor, content]);
+  }, [initialContent, editor]);
 
   return (
     <div className="editor-container">

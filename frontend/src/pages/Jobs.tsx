@@ -32,12 +32,12 @@ enum Jobs {
   const [searchpost,setSearchpost] = useState<JobApplication[]>([])
   const [userProfile,setUserProfile] = useRecoilState(UserProfile)
 
-  const getAllApplications = async (jobType: Jobs): Promise<{Data:JobApplication[],Profile:{Profile:string,username:string}}> => {
+  const getAllApplications = async (jobType: Jobs): Promise<{Data:JobApplication[],Profile:{Profile:string,Name:string}}> => {
     try {
       const response = await api.get(`/applicant/getallapplication${jobType}`);
       return response.data;
     } catch (error) {
-      return {Data:[],Profile:{Profile:"",username:""}};
+      return {Data:[],Profile:{Profile:"",Name:""}};
     }
   };
 
@@ -69,8 +69,8 @@ const debouncedSearch = useCallback(
     const fetchApplications = async () => {
       const result = await getAllApplications(selectedJobType);
       setAllApplications(result.Data);
-      setUserProfile((prev)=>({...prev,Profile:result.Profile.Profile,Name:result.Profile.username}))
-      localStorage.setItem("userprofile",JSON.stringify(userProfile))
+      setUserProfile((prev)=>({...prev,Profile:result.Profile.Profile,Name:result.Profile.Name}))
+      localStorage.setItem('profile',JSON.stringify(result.Profile))
     };
     fetchApplications();
   }, [selectedJobType]);

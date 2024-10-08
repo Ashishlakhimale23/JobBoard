@@ -6,16 +6,14 @@ const user = new mongoose.Schema({
         required:true,
         unique:true
     },
-    username:{
-        type:String,
-        required:true,
-    },
     firebaseUid:{
         type:String,
         required:true 
     },
     Name:{
         type:String,
+        required:true,
+        unique:true
     },
     Profile:{
         type:String,
@@ -37,6 +35,12 @@ const user = new mongoose.Schema({
         type:[{}]
     },
     education:{
+        type:[{}]
+    },
+    Portfolio:{
+        type:String,
+    },
+    Projects:{
         type:[{}]
     },
     JobUploaded:[{

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import {useMemo, useCallback,useEffect } from 'react';
 import { EditorContent, JSONContent, useEditor} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from "@tiptap/extension-link";
@@ -7,6 +7,7 @@ import BulletList from '@tiptap/extension-bullet-list';
 import '../App.css';
 
 const MenuBar = ({ editor }: { editor: any }) => {
+
   if (!editor) {
     return null;
   }
@@ -89,20 +90,20 @@ const MenuBar = ({ editor }: { editor: any }) => {
     </div>
   );
 };
-
+const defaultContent = {
+  type: "doc",
+  content: [],
+};
 export const TextEditor = ({initialContent,onUpdate}:{initialContent:JSONContent,onUpdate:(content:JSONContent)=>void}) => {
+const content = useMemo(() => {
+    return initialContent && initialContent.type === "doc" 
+      ? initialContent 
+      : defaultContent;
+  }, [initialContent])
   const editor = useEditor({
     
     extensions: [
       StarterKit,
-      OrderedList.configure({
-        keepMarks: true,
-        keepAttributes: true,
-      }),
-      BulletList.configure({
-        keepMarks: true,
-        keepAttributes: true,
-      }),
       Link.configure({
         openOnClick: true,
         autolink: true,
@@ -110,7 +111,7 @@ export const TextEditor = ({initialContent,onUpdate}:{initialContent:JSONContent
         validate: (href) => /^https?:\/\//.test(href),
       }),
     ],
-    content:initialContent,
+    content,
     editorProps: {
       attributes: {
         class: 'focus:outline-none editor-content max-w-full min-h-40 focus:ring-2 rounded-lg p-4 focus:ring-blue-600',
@@ -122,6 +123,11 @@ export const TextEditor = ({initialContent,onUpdate}:{initialContent:JSONContent
       onUpdate(jsonContent)
     },
   });
+useEffect(() => {
+    if (editor && initialContent !== editor.getJSON()) {
+      editor.commands.setContent(content);
+    }
+  }, [initialContent, editor]);
 
   return (
     <div className="">

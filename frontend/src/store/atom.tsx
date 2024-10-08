@@ -1,5 +1,5 @@
 import { CreateApplications, Education, workexperience } from "@/types/type"
-import { UsersProfile } from "@/types/type";
+import { UsersProfile,Projects } from "@/types/type";
 import {atom} from "recoil"
 //Defaults
 export const CreateApplicationDefault: CreateApplications = {
@@ -50,6 +50,17 @@ export const educationdefault :Education={
     content: [],
   },
 }
+
+export const projectdefault:Projects={
+  Title:"",
+  GithubLink:"",
+  LiveLink:"",
+  AboutProject:{
+    type:"doc",
+    content:[],
+  }
+}
+
 export const UserProfileDefault:UsersProfile={
   Name:'',
   Profile:"",
@@ -61,7 +72,10 @@ export const UserProfileDefault:UsersProfile={
   workExperience:[workExperienceDefault],
   education:[educationdefault],
   Linkedin:"",
-  twitter:""
+  twitter:"",
+  Protfolio:"",
+  Projects:[projectdefault]
+
 }
 
 //atoms

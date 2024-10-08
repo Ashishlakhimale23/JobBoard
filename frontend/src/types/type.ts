@@ -1,5 +1,6 @@
 import { AxiosError,AxiosResponse } from "axios"
 import { JSONContent } from "@tiptap/react"
+import { intersection } from "zod"
 export interface CustomAxiosError extends AxiosError{
   response?:AxiosResponse<{message:string}>
 }
@@ -37,6 +38,13 @@ export interface Education{
   AboutCourse:JSONContent
 }
 
+export interface Projects{
+  Title:string,
+  AboutProject:JSONContent,
+  GithubLink:string,
+  LiveLink:String,
+}
+
 export interface UsersProfile{
   Name:string,
   AboutMe:JSONContent,
@@ -46,4 +54,6 @@ export interface UsersProfile{
   education:Education[]
   Linkedin:string,
   twitter:string
+  Protfolio:string,
+  Projects:Projects[],
 }
