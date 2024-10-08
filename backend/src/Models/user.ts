@@ -1,4 +1,4 @@
-import { required } from "joi";
+
 import mongoose from "mongoose";
 const user = new mongoose.Schema({
     email:{
@@ -45,11 +45,11 @@ const user = new mongoose.Schema({
     },
     JobUploaded:[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"Applicant"
+        ref:"Application"
     }],
     Application:[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"Applicant"
+        ref:"Application"
     }],
     },{
     timestamps:true

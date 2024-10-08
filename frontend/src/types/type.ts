@@ -57,3 +57,13 @@ export interface UsersProfile{
   Protfolio:string,
   Projects:Projects[],
 }
+
+export interface JobApplication {
+  JobTitle: string;
+  WorkMode: string;
+  Type: string;
+  AverageSalary: number;
+  CompanyLogo: string;
+  Location: string;
+  JobLink:string
+}

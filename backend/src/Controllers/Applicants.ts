@@ -3,6 +3,7 @@ import { Request,Response } from "express"
 import { CloudinaryUpload } from "../Utils/CloudinaryUpload";
 import { User } from "../Models/user";
 import { RemoveAnySpaces } from "../Utils/RemoveSpaces";
+import mongoose from "mongoose";
 export const CreateApplication =async (req:Request,res:Response)=>{
     const uid = req.uid
     if(!req.body){
@@ -128,7 +129,7 @@ export const GetAllApplicationsWithRecent=async(req:Request,res:Response)=>{
 }
 
 export const GetParticularJob=async(req:Request,res:Response)=>{
-    console.log(req)
+    const uid = req.uid
     const jobLink = req.query.jobLink as string;
     console.log(jobLink);
     if(!jobLink){
@@ -136,10 +137,15 @@ export const GetParticularJob=async(req:Request,res:Response)=>{
     }
     try{
         const response = await Application.findOne({JobLink:jobLink});
+        
+        console.log(response?._id)
+        const useruploaded = await User.findOne({firebaseUid:uid,JobUploaded:{$in:[response?._id]}})
+        const userapplied = await User.findOne({firebaseUid:uid,Application:{$in:[response?._id]}})
+        let appliedoruploder = userapplied != null || useruploaded != null ? true : false;
         if(!response){
             return res.status(404).json({message:"No application found"});
         }
-        return res.status(200).json({Data:response});
+        return res.status(200).json({Data:response,applybutton:appliedoruploder});
     }catch(error){
         return res.status(500).json({message:'internal server error'})
     }
@@ -205,9 +211,7 @@ export const GetUserData=async(req:Request,res:Response)=>{
 
 export const GetUser=async(req:Request,res:Response)=>{
     const uid = req.uid;
-    
     try{
-
         const response = await User.findOne({firebaseUid:uid});
         if(!response){
             return res.status(500).json({message:"internal server error"})
@@ -216,5 +220,71 @@ export const GetUser=async(req:Request,res:Response)=>{
         
     }catch(error){
         return res.status(500).json({message:"internal server error"})
+    }
+}
+
+export const ApplyForJob=async(req:Request<{},{},{joblink:string}>,res:Response)=>{
+    const uid =req.uid;
+    console.log(req.body)
+    const {joblink} = req.body;
+    if(!joblink){
+        return res.status(400).json({message:"no joblink provided"})
+    }
+    try{
+        const user = await User.findOne({firebaseUid:uid});
+        if(!user){
+            return res.status(400).json({message:"user doesnt exist"});
+        }
+        const response = await Application.findOneAndUpdate({JobLink:joblink},{$push:{'Applicants':user._id}});
+        const result = await User.findOneAndUpdate({firebaseUid:uid},{$push:{'Application':response?._id}})
+        if(!response){
+            return res.status(500).json({message:"internal server error"})
+        }
+        return res.status(200).json({message:"Applied"});
+
+    }catch(error){
+        return res.status(500).json({message:'internal server error'});
+    }
+
+}
+
+
+export const GetUploadedJobs=async(req:Request,res:Response)=>{
+    const uid =req.uid;
+    try{
+        const response = await User.findOne({firebaseUid:uid}).select("JobUploaded").populate({
+            path:'JobUploaded',
+            select:'JobTitle WorkMode Location Type AverageSalary CompanyLogo JobLink'
+        });
+        console.log(response)
+        if(!response){
+            return res.status(500).json({message:"internal server error"})
+        }
+        return res.status(200).json({Data:response})
+
+    }catch(error){
+        console.log(error)
+        return res.status(500).json({message:"internal server error"})
+
+    }
+}
+
+export const GetAppliedforJobs=async(req:Request,res:Response)=>{
+    const uid =req.uid;
+    try{
+        const response = await User.findOne({firebaseUid:uid}).select('Application').populate({
+            path:'Application',
+            select:'JobTitle WorkMode Location Type AverageSalary CompanyLogo JobLink'
+        });
+        console.log(response)
+        if(!response){
+            return res.status(500).json({message:"internal server error"})
+        }
+        return res.status(200).json({Data:response})
+
+    }catch(error){
+        console.log(error)
+        return res.status(500).json({message:"internal server error"})
+
     }
 }

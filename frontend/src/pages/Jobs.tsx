@@ -4,18 +4,11 @@ import { useState,useEffect,useCallback } from "react";
 import debounce from "lodash.debounce"
 import { useRecoilState } from "recoil";
 import { UserProfile } from "@/store/atom";
+import { JobApplication } from "@/types/type";
 
 export function Jobs(){
   
- interface JobApplication {
-  JobTitle: string;
-  WorkMode: string;
-  Type: string;
-  AverageSalary: number;
-  CompanyLogo: string;
-  Location: string;
-  JobLink:string
-}
+ 
 
 enum Jobs {
   remote = 'remote',

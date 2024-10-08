@@ -14,6 +14,7 @@ export const AuthMidddleware=async(req:Request,res:Response,next:NextFunction)=>
     }else{
         try{
             const authtoken = token.split(" ")[1]
+            console.log(authtoken)
             let checkrevoked = true 
             await admin.auth().verifyIdToken(authtoken,checkrevoked).then((payload)=>{
 

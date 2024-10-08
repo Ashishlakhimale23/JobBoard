@@ -7,6 +7,7 @@ import { Header } from "./Header";
 import { JobInfo } from "@/pages/JobInfo";
 import { ProfileInfo } from "./ProfileInfoForm";
 import { UserProfiles } from "@/pages/UserProfile";
+import { Dashboard } from "@/pages/Dashboard";
 
 export function Layout(){
   const onheader:[string] = ['/'];
@@ -23,6 +24,7 @@ export function Layout(){
          <Route path="/editprofile" element={<ProfileInfo/>}/>
          <Route path="/job/:jobLink" element={<JobInfo/>}/>
          <Route path="/:Name" element={<UserProfiles/>}/>
+         <Route path="/dashboard" element={<Dashboard/>}/>
 
           </Route>
         </Routes>

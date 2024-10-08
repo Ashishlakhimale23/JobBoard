@@ -105,3 +105,9 @@ export const SettingsModal = atom<boolean>({
   default:false
   
 })
+
+export const ConformationModalState = atom<boolean>({
+  key:"Conformation",
+  default:false
+
+})

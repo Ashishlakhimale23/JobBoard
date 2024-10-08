@@ -7,8 +7,11 @@ export function Header(){
   const imgRef = useRef<HTMLImageElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const [settingsModal, setSettingsModal] = useRecoilState(SettingsModal);
-  const [profile,setProfile] = useState<{Profile:string,Name:string}>({Profile:'',Name:""})
-  const {Profile,Name} = useRecoilValue(UserProfile)
+  const [profile, setProfile] = useState<{ Profile: string; Name: string }>({
+    Profile: "",
+    Name: "",
+  });
+  const { Profile, Name } = useRecoilValue(UserProfile);
 
   useEffect(() => {
     if (settingsModal) {
@@ -16,17 +19,14 @@ export function Header(){
     } else {
       document.body.removeEventListener("mousedown", settingmodal);
     }
-
-    
   }, [settingsModal, setSettingsModal, settingmodal]);
 
-  useEffect(()=>{
-    if(!Profile){
-    const profile = localStorage.getItem("profile")
-    profile ? setProfile(JSON.parse(profile)):null;
-    } 
-
-  },[])
+  useEffect(() => {
+    if (!Profile) {
+      const profile = localStorage.getItem("profile");
+      profile ? setProfile(JSON.parse(profile)) : null;
+    }
+  }, []);
 
   function settingmodal(e: MouseEvent) {
     if (imgRef.current !== null && modalRef.current !== null) {
@@ -50,81 +50,91 @@ export function Header(){
           <span className="text-white">Sphere</span>
         </div>
 
-<div className="flex items-center space-x-8">
-        <div className="space-x-4 text-white font-bold ">
-          <button className="hover:underline hidden sm:inline-block" onClick={() => navigate("/jobs")}>
-            Jobs
-          </button>
-          <button
-            className="hover:underline hidden sm:inline-block"
-            onClick={() => navigate("/createpost")}
-          >
-            Post Jobs
-          </button>
-        </div>
-        <div>
-          <img
-            src={!Profile ? profile.Profile :Profile as string }
-            className="w-11 h-11 rounded-full hover:opacity-75 md:w-[50px] md:h-[50px]"
-            ref={imgRef}
-            onClick={() => {
-              setSettingsModal((prevSettingModal) => !prevSettingModal);
-            }}
-          />
-        </div>
-        <div
-          className={`
+        <div className="flex items-center space-x-8">
+          <div className="space-x-4 text-white font-bold ">
+            <button
+              className="hover:underline hidden sm:inline-block"
+              onClick={() => navigate("/jobs")}
+            >
+              Jobs
+            </button>
+            <button
+              className="hover:underline hidden sm:inline-block"
+              onClick={() => navigate("/createpost")}
+            >
+              Post Jobs
+            </button>
+          </div>
+          <div>
+            <img
+              src={!Profile ? profile.Profile : (Profile as string)}
+              className="w-11 h-11 rounded-full hover:opacity-75 md:w-[50px] md:h-[50px]"
+              ref={imgRef}
+              onClick={() => {
+                setSettingsModal((prevSettingModal) => !prevSettingModal);
+              }}
+            />
+          </div>
+          <div
+            className={`
         ${settingsModal ? "block" : "hidden"}
         fixed mt-20 bg-zinc-900 rounded-lg top-0
         right-4 md:right-6 xl:right-auto xl:left-[calc(50%+25rem)]
         w-44 max-w-7xl mx-auto
         z-20
       `}
-          ref={modalRef}
-        >
-          <div className="bg-silver text-white font-space px-2 py-2 rounded-md">
-            <button
-              className=" px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left font-semibold"
-              onClick={() => {
-                setSettingsModal(false);
-                navigate(`/${Name}`);
-              }}
-            >
-              Profile
-            </button>
-
-            <button
-              className={`sm:hidden px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left font-semibold`}
-              onClick={() => {
-                setSettingsModal(false);
-                navigate("/jobs");
-              }}
-            >
-             Jobs 
-            </button>
-            <button
-              className="sm:hidden font-semibold px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left "
-
-              onClick={() => {
-                setSettingsModal(false);
-                navigate("/createpost");
-              }}
-            >
-              Post Job 
-            </button>
-            <button
-              className="px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left font-semibold"
-              onClick={() => {
-                setSettingsModal(false);
-                localStorage.removeItem("AccessToken");
-                localStorage.removeItem("application");
-                window.location.href = "/";
-              }}
-            >
-              Signout
-            </button>
+            ref={modalRef}
+          >
+            <div className="bg-silver text-white font-space px-2 py-2 rounded-md">
+              <button
+                className=" px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left font-semibold"
+                onClick={() => {
+                  setSettingsModal(false);
+                  navigate(`/${Name}`);
+                }}
+              >
+                Profile
+              </button>
+              <button
+                className=" px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left font-semibold"
+                onClick={() => {
+                  setSettingsModal(false);
+                  navigate(`/dashboard`);
+                }}
+              >
+                Dashboard
+              </button>
+              <button
+                className={`sm:hidden px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left font-semibold`}
+                onClick={() => {
+                  setSettingsModal(false);
+                  navigate("/jobs");
+                }}
+              >
+                Jobs
+              </button>
+              <button
+                className="sm:hidden font-semibold px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left "
+                onClick={() => {
+                  setSettingsModal(false);
+                  navigate("/createpost");
+                }}
+              >
+                Post Job
+              </button>
+              <button
+                className="px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left font-semibold"
+                onClick={() => {
+                  setSettingsModal(false);
+                  localStorage.removeItem("AccessToken");
+                  localStorage.removeItem("application");
+                  window.location.href = "/";
+                }}
+              >
+                Signout
+              </button>
+            </div>
           </div>
-        </div>
         </div>
       </header>
     </>
