@@ -3,12 +3,13 @@ import { Request,Response } from "express"
 import { CloudinaryUpload } from "../Utils/CloudinaryUpload";
 import { User } from "../Models/user";
 import { RemoveAnySpaces } from "../Utils/RemoveSpaces";
-import mongoose from "mongoose";
+
 export const CreateApplication =async (req:Request,res:Response)=>{
     const uid = req.uid
     if(!req.body){
         return res.status(400).json({message:"application field is empty."})
     }
+    
     const {Category,AverageSalary,Type,WorkMode,Location,ApplicationLink,Responsibilities,Qualification,JobTitle,CompanyOverview,CompanyEmail,CompanyName} = req.body;
     let jobLink:string ; 
     let companyname = JobTitle.replace(/\s+/g,' ').trim();
@@ -74,7 +75,7 @@ export const GetAllApplications=async(req:Request,res:Response)=>{
 }
 export const GetAllApplicationsWithFullTime=async(req:Request,res:Response)=>{
     try{
-        const response = await Application.find({Type:'Full Time'}).select("JobTitle WorkMode Location Type AverageSalary CompanyLogo");
+        const response = await Application.find({Type:'Full Time'}).select("JobTitle WorkMode Location Type AverageSalary JobLink CompanyLogo");
         if(!response.length){
             return res.status(404).json({ message: 'No applications found' });
         }
@@ -85,7 +86,7 @@ export const GetAllApplicationsWithFullTime=async(req:Request,res:Response)=>{
 }
 export const GetAllApplicationsWithRemote=async(req:Request,res:Response)=>{
     try{
-        const response = await Application.find({WorkMode:'Remote'}).select("JobTitle WorkMode Location Type AverageSalary CompanyLogo");
+        const response = await Application.find({WorkMode:'Remote'}).select("JobTitle JobLink WorkMode Location Type AverageSalary CompanyLogo");
         if(!response.length){
             return res.status(404).json({ message: 'No applications found' });
         }
@@ -96,7 +97,7 @@ export const GetAllApplicationsWithRemote=async(req:Request,res:Response)=>{
 }
 export const GetAllApplicationsWithHybrid=async(req:Request,res:Response)=>{
     try{
-        const response = await Application.find({WorkMode:'Hybrid'}).select("JobTitle WorkMode Location Type AverageSalary CompanyLogo");
+        const response = await Application.find({WorkMode:'Hybrid'}).select("JobTitle WorkMode JobLink Location Type AverageSalary CompanyLogo");
         if(!response.length){
             return res.status(404).json({ message: 'No applications found' });
         }
@@ -107,7 +108,7 @@ export const GetAllApplicationsWithHybrid=async(req:Request,res:Response)=>{
 }
 export const GetAllApplicationsWithInternship=async(req:Request,res:Response)=>{
     try{
-        const response = await Application.find({Type:'Internship'}).select("JobTitle WorkMode Location Type AverageSalary CompanyLogo");
+        const response = await Application.find({Type:'Internship'}).select("JobTitle JobLink WorkMode Location Type AverageSalary CompanyLogo");
         if(!response.length){
             return res.status(404).json({ message: 'No applications found' });
         }
@@ -118,7 +119,7 @@ export const GetAllApplicationsWithInternship=async(req:Request,res:Response)=>{
 }
 export const GetAllApplicationsWithRecent=async(req:Request,res:Response)=>{
     try{
-        const response = await Application.find({}).sort({createdAt:-1}).select("JobTitle WorkMode Location Type AverageSalary CompanyLogo");
+        const response = await Application.find({}).sort({createdAt:-1}).select("JobTitle WorkMode Location Type AverageSalary CompanyLogo JobLink");
         if(!response.length){
             return res.status(404).json({ message: 'No applications found' });
         }
@@ -158,6 +159,7 @@ export const EditProfile=async(req:Request,res:Response)=>{
     if(!req.body){
         return res.status(400).json({message:"no data provided"})
     }
+    console.log(req.body)
     const {Name,
   AboutMe,
   workExperience,
@@ -165,17 +167,17 @@ export const EditProfile=async(req:Request,res:Response)=>{
   education,
   Linkedin,
   twitter,skills,
-Portfolio} = req.body
+Portfolio,Projects} = req.body
     try{
          let Image
         if(req.file) {
            Image = await CloudinaryUpload(req.file); 
-        const response = await User.findOneAndUpdate({firebaseUid:uid},{Name:Name,AboutMe:AboutMe,workExperience:workExperience,education:education,Linkedin:Linkedin,twitter:twitter,Profile:Image,skills:skills,Portfolio:Portfolio})
+        const response = await User.findOneAndUpdate({firebaseUid:uid},{Name:Name,AboutMe:AboutMe,workExperience:workExperience,education:education,Linkedin:Linkedin,twitter:twitter,Profile:Image,skills:skills,Portfolio:Portfolio,Projects:Projects})
         if(!response){
             return res.status(500).json({message:"internal server error"});
         }
         }
-        const response = await User.findOneAndUpdate({firebaseUid:uid},{Name:Name,AboutMe:AboutMe,workExperience:workExperience,education:education,Linkedin:Linkedin,twitter:twitter,Profile:Profile,skills:skills,Portfolio:Portfolio})
+        const response = await User.findOneAndUpdate({firebaseUid:uid},{Name:Name,AboutMe:AboutMe,workExperience:workExperience,education:education,Linkedin:Linkedin,twitter:twitter,Profile:Profile,skills:skills,Portfolio:Portfolio,Projects:Projects})
         if(!response){
             return res.status(500).json({message:"internal server error"});
         }
