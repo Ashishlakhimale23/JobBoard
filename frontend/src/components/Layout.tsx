@@ -8,6 +8,7 @@ import { JobInfo } from "@/pages/JobInfo";
 import { ProfileInfo } from "./ProfileInfoForm";
 import { UserProfiles } from "@/pages/UserProfile";
 import { Dashboard } from "@/pages/Dashboard";
+import { ShowApplicant } from "@/pages/ShowApplicant";
 
 export function Layout(){
   const onheader:[string] = ['/'];
@@ -25,7 +26,7 @@ export function Layout(){
          <Route path="/job/:jobLink" element={<JobInfo/>}/>
          <Route path="/:Name" element={<UserProfiles/>}/>
          <Route path="/dashboard" element={<Dashboard/>}/>
-
+         <Route path="/applicants/:JobLink" element={<ShowApplicant/>}/>
           </Route>
         </Routes>
       </>

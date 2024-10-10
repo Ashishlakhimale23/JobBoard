@@ -2,8 +2,6 @@ import {useMemo, useCallback,useEffect } from 'react';
 import { EditorContent, JSONContent, useEditor} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from "@tiptap/extension-link";
-import OrderedList from '@tiptap/extension-ordered-list';
-import BulletList from '@tiptap/extension-bullet-list';
 import '../App.css';
 
 const MenuBar = ({ editor }: { editor: any }) => {
@@ -127,7 +125,7 @@ useEffect(() => {
     if (editor && initialContent !== editor.getJSON()) {
       editor.commands.setContent(content);
     }
-  }, [initialContent, editor]);
+  }, [initialContent,editor]);
 
   return (
     <div className="">

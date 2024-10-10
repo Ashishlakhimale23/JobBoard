@@ -67,7 +67,7 @@ export function Header(){
           </div>
           <div>
             <img
-              src={!Profile ? profile.Profile : (Profile as string)}
+              src={profile.Profile}
               className="w-11 h-11 rounded-full hover:opacity-75 md:w-[50px] md:h-[50px]"
               ref={imgRef}
               onClick={() => {

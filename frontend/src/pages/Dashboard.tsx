@@ -3,11 +3,19 @@ import { useCallback, useEffect, useState } from "react";
 import { CustomAxiosError, JobApplication } from "@/types/type";
 import {toast} from "react-hot-toast"
 import { HomeJobCard } from "@/components/HomeJobCard";
+import { useRecoilState } from "recoil";
+import { OnTap } from "@/store/atom";
+import { AppliedJobCard } from "@/components/AppliedJobCard";
 
 
 export function Dashboard(){
-  const [onTap, setOnTap] = useState("uploaded");
+  interface Application  {
+    ApplicationID : JobApplication,
+    status:string,
+  } 
+  const [onTap,setOnTap] = useRecoilState(OnTap);
   const [uploadedjobs, setUploadedjobs] = useState<JobApplication[]>([]);
+  const [applied,setApplied] = useState<Application[]>([])
   const handleOnClickUpload = useCallback(async () => {
 setOnTap("uploaded");
     try {
@@ -36,8 +44,8 @@ setOnTap("uploaded");
         setOnTap('applied')
     try {
       const response = await api.get("/applicant/getappliedjobs");
-      setUploadedjobs(response.data.Data.Application);
-
+      console.log(response.data)
+      setApplied(response.data.Data.Application);
     } catch (error) {
       if (error) {
         const axiosError = error as CustomAxiosError;
@@ -91,7 +99,8 @@ setOnTap("uploaded");
       </section>
 
         <div className="w-full max-w-5xl mx-auto p-4 space-y-3">
-          {uploadedjobs.length ? uploadedjobs.map((job, index) => (
+          {
+          onTap === "uploaded" ? uploadedjobs.map((job, index) => (
             <HomeJobCard
               key={index}
               Type={job.Type}
@@ -102,11 +111,22 @@ setOnTap("uploaded");
               CompanyLogo={job.CompanyLogo}
               JobLink={job.JobLink}
             />
-          )) : <div className="text-white w-full max-w-xl mx-auto text-center p-4" >No jobs uploaded</div>}
+          )):
+            applied && applied.map((job,index)=>(
+              <AppliedJobCard
+              key={index}
+              Type={job.ApplicationID.Type}
+              JobTitle={job.ApplicationID.JobTitle}
+              AverageSalary={job.ApplicationID.AverageSalary}
+              Location={job.ApplicationID.Location}
+              WorkMode={job.ApplicationID.WorkMode}
+              CompanyLogo={job.ApplicationID.CompanyLogo}
+              JobLink={job.ApplicationID.JobLink}
+              status={job.status}
+               />
+            ))
+          }
         </div>
-
-
-      
     </>
   );
 }

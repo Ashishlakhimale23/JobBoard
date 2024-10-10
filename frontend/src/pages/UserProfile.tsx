@@ -118,7 +118,7 @@ useEffect(() => {
 
         <div className={`${!userProfile.skills.length ? "hidden" : "block"}`}>
           <p className="font-semibold text-white text-xl">Skills</p>
-          <div className="p-4 flex gap-1">
+          <div className="p-4 flex flex-wrap gap-1">
             {userProfile.skills &&
               userProfile.skills.map((items, index) => (
                 <div

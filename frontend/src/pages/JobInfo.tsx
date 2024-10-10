@@ -20,6 +20,7 @@ export function JobInfo(){
       });
       return response.data;
     } catch (error) {
+      console.log(error)
       toast.error("Could'nt fetch the job.");
       return {Data:CreateApplicationDefault,applybutton:false};
     }
@@ -28,7 +29,6 @@ export function JobInfo(){
   useEffect(() => {
     const fetchjob = async () => {
       const response = await getjob();
-      console.log(response);
       setJob(response.Data);
       setJob((prev) => ({
         ...prev,
@@ -46,7 +46,7 @@ export function JobInfo(){
       setDisplaybutton(response.applybutton);
     };
     fetchjob();
-  }, []);
+  }, [getjob]);
   return (
     <>
       <div className="sm:max-w-4xl sm:mx-auto space-y-4 p-3">

@@ -111,3 +111,9 @@ export const ConformationModalState = atom<boolean>({
   default:false
 
 })
+
+export const OnTap =atom<string>({
+  key:"OnTap",
+  default:"uploaded"
+
+})

@@ -140,7 +140,9 @@ export const GetParticularJob=async(req:Request,res:Response)=>{
         
         console.log(response?._id)
         const useruploaded = await User.findOne({firebaseUid:uid,JobUploaded:{$in:[response?._id]}})
-        const userapplied = await User.findOne({firebaseUid:uid,Application:{$in:[response?._id]}})
+        console.log(useruploaded)
+        const userapplied = await User.findOne({firebaseUid:uid,Application:{$elemMatch:{ApplicationID:response?._id}}})
+        console.log(userapplied)
         let appliedoruploder = userapplied != null || useruploaded != null ? true : false;
         if(!response){
             return res.status(404).json({message:"No application found"});
@@ -178,7 +180,6 @@ Portfolio} = req.body
             return res.status(500).json({message:"internal server error"});
         }
 
-        
         
         return res.status(200).json({message:"profile edited"});
     }catch(error){
@@ -235,13 +236,16 @@ export const ApplyForJob=async(req:Request<{},{},{joblink:string}>,res:Response)
         if(!user){
             return res.status(400).json({message:"user doesnt exist"});
         }
-        const response = await Application.findOneAndUpdate({JobLink:joblink},{$push:{'Applicants':user._id}});
-        const result = await User.findOneAndUpdate({firebaseUid:uid},{$push:{'Application':response?._id}})
-        if(!response){
+        const check = await Application.findOne({JobLink:joblink,Applicants:{$elemMatch:{ApplicantID:user._id}}})
+        if(check != null){
+            return res.status(400).json({message:"already applied"})
+        }
+        const response = await Application.findOneAndUpdate({JobLink:joblink},{$push:{'Applicants':{ApplicantsID:user._id,status:"Applied"}}});
+        const result = await User.findOneAndUpdate({firebaseUid:uid},{$push:{'Application':{ApplicationID:response?._id,status:"Applied"}}})
+        if(!response || !result){
             return res.status(500).json({message:"internal server error"})
         }
         return res.status(200).json({message:"Applied"});
-
     }catch(error){
         return res.status(500).json({message:'internal server error'});
     }
@@ -272,9 +276,9 @@ export const GetUploadedJobs=async(req:Request,res:Response)=>{
 export const GetAppliedforJobs=async(req:Request,res:Response)=>{
     const uid =req.uid;
     try{
-        const response = await User.findOne({firebaseUid:uid}).select('Application').populate({
-            path:'Application',
-            select:'JobTitle WorkMode Location Type AverageSalary CompanyLogo JobLink'
+    const response = await User.findOne({firebaseUid:uid}).select('Application').populate({
+            path:'Application.ApplicationID',
+            select:'JobTitle WorkMode Location Type AverageSalary CompanyLogo JobLink',
         });
         console.log(response)
         if(!response){
@@ -288,3 +292,104 @@ export const GetAppliedforJobs=async(req:Request,res:Response)=>{
 
     }
 }
+
+export const GetApplicants = async (req: Request, res: Response) => {
+    const uid = req.uid;
+    const jobLink = req.query.JobLink as string;
+
+    if (!jobLink) {
+        return res.status(400).json({ message: "JobLink is required" });
+    }
+
+    try {
+       
+        const application = await Application.findOne({ JobLink: jobLink })
+            .select('Applicants')
+            .populate({
+                path: 'Applicants.ApplicantsID',
+                select: {
+                    email: 1,
+                    Name: 1,
+                    Profile: 1,  
+                    skills: { $slice: 3 }
+                }
+            });
+
+        if (!application) {
+            return res.status(400).json({ message: "Job application not found" });
+        }
+
+       
+        const user = await User.findOne({
+            firebaseUid: uid,
+            JobUploaded: application._id  
+        });
+
+        if (!user) {
+            return res.status(403).json({ message: "You don't have permission to view these applicants" });
+        }
+
+        return res.status(200).json({
+            Data: application
+        });
+
+    } catch (error) {
+        console.error('Error in GetApplicants:', error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export const updateApplicantStatus = async (req: Request, res: Response) => {
+  const { JobLink, applicantId, newStatus } = req.body;
+  const uid = req.uid; 
+
+  if (!JobLink || !applicantId || !newStatus) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  try {
+    const application = await Application.findOne({
+      JobLink,
+      'Applicants._id': applicantId
+    });
+
+    if (!application) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    const user = await User.findOne({
+      firebaseUid: uid,
+      JobUploaded: application._id
+    });
+
+    if (!user) {
+      return res.status(403).json({ message: "You don't have permission to update this application" });
+    }
+
+    const updatedApplication = await Application.findOneAndUpdate(
+      {
+        JobLink,
+        'Applicants._id': applicantId
+      },
+      {
+        $set: {
+          'Applicants.$.status': newStatus
+        }
+      },
+      { new: true }
+    );
+
+    if (!updatedApplication) {
+      return res.status(404).json({ message: "Failed to update status" });
+    }
+
+    return res.status(200).json({
+      message: "Status updated successfully",
+      data: updatedApplication
+    });
+
+  } catch (error) {
+    console.error('Error updating applicant status:', error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

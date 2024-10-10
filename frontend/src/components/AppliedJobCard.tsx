@@ -1,9 +1,8 @@
 import { OnTap } from "@/store/atom";
-import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-
-export function HomeJobCard({CompanyLogo,JobTitle,Type,WorkMode,Location,AverageSalary,JobLink}:{CompanyLogo:string,JobTitle:string,Type:string,WorkMode:string,Location:string,AverageSalary:number,JobLink:string}){
-  const onTap = useRecoilValue(OnTap)
+import { useNavigate } from "react-router-dom";
+export function AppliedJobCard({CompanyLogo,JobTitle,Type,WorkMode,Location,JobLink,status}:{CompanyLogo:string,JobTitle:string,Type:string,WorkMode:string,Location:string,AverageSalary:number,JobLink:string,status:string}){
+    const onTap = useRecoilValue(OnTap)
   const navigate = useNavigate()
   return (
 
@@ -26,18 +25,12 @@ export function HomeJobCard({CompanyLogo,JobTitle,Type,WorkMode,Location,Average
         </div>
       </div>
       <div className="flex items-center">
-        <p className={`${location.pathname === '/dashboard' ? "hidden" :"px-3 text-sm py-1 h-fit text-gray-800 font-bold rounded-xl bg-zinc-100"}`}>
-          ${AverageSalary}
+        <p className="px-3 text-sm py-1 h-fit text-gray-800 font-bold rounded-xl bg-zinc-100">
+            {status}
         </p>
-        <button className={`${location.pathname ==='/dashboard' && onTap =='uploaded' ? "px-3 text-sm py-1 h-fit text-zinc-100 hover:underline font-bold " :"hidden "}`}
-        onClick={(e)=>{
-          e.stopPropagation()
-          navigate(`/applicants/${JobLink}`)}}
-        >
-          See Applicants 
-        </button>
       </div>
     </div>
     </>
   );
+
 }

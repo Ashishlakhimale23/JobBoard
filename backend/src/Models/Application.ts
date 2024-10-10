@@ -55,8 +55,15 @@ const ApplicationSchema = new mongoose.Schema({
     unique:true
   },
  Applicants:[{
+        ApplicantsID:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"user"
+        ref:"User"
+        },
+        status:{
+          type:String,
+          enum: ["Applied","Under Review","Interviewed", "Hired","Rejected","On Hold","Withdrawn","No Response"],
+          default:"Applied"
+        }
     }],
 
 },{

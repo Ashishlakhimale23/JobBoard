@@ -2,14 +2,12 @@ import { HomeJobCard } from "../components/HomeJobCard"
 import { api } from "@/utils/AxioApi";
 import { useState,useEffect,useCallback } from "react";
 import debounce from "lodash.debounce"
-import { useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { UserProfile } from "@/store/atom";
 import { JobApplication } from "@/types/type";
 
 export function Jobs(){
   
- 
-
 enum Jobs {
   remote = 'remote',
   fullTime = 'fulltime',
@@ -23,13 +21,14 @@ enum Jobs {
   const [allApplications, setAllApplications] = useState<JobApplication[]>([]);
   const [selectedJobType, setSelectedJobType] = useState<Jobs>(Jobs.jobs);
   const [searchpost,setSearchpost] = useState<JobApplication[]>([])
-  const [userProfile,setUserProfile] = useRecoilState(UserProfile)
+  const setUserProfile = useSetRecoilState(UserProfile)
 
   const getAllApplications = async (jobType: Jobs): Promise<{Data:JobApplication[],Profile:{Profile:string,Name:string}}> => {
     try {
       const response = await api.get(`/applicant/getallapplication${jobType}`);
       return response.data;
     } catch (error) {
+      console.log(error)
       return {Data:[],Profile:{Profile:"",Name:""}};
     }
   };
@@ -71,7 +70,7 @@ const debouncedSearch = useCallback(
   return (
     <>
       <div className=" text-white w-full min-h-screen px-4 mx-auto pb-8 max-w-7xl">
-        <div className="w-full mx-auto max-w-3xl py-20 sm:py-28">
+        <div className="w-full mx-auto max-w-3xl py-12 sm:py-20">
           <div className="w-full text-center space-y-9">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
               Find a job of your dreams.

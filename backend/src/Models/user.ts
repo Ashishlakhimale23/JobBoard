@@ -48,10 +48,18 @@ const user = new mongoose.Schema({
         ref:"Application"
     }],
     Application:[{
+        ApplicationID:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Application"
-    }],
-    },{
+        },
+        status:{
+            type:String,
+            enum: ["Applied","Under Review","Interviewed","Hired","Rejected"],
+            default:"Applied",
+        }
+    }
+    ],
+}, {
     timestamps:true
 })
 export const User = mongoose.model("User",user)

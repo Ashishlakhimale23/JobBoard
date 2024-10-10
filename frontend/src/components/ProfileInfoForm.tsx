@@ -16,7 +16,6 @@ export function ProfileInfo(){
    const [predicated, setPredicated] = useState<string[]>([]);
   let {
     Name,
-    Profile,
     Protfolio,
     AboutMe,
     skills,
@@ -34,7 +33,7 @@ export function ProfileInfo(){
 
     let userdata = localStorage.getItem("userprofile") 
     console.log(userdata)
-    let userdataparsed = userdata ? JSON.parse(userdata) : null 
+    const userdataparsed = userdata ? JSON.parse(userdata) : null 
     if(userdataparsed === null){
       const result= await api.get("/applicant/getuser");
     const updatedProfile = {

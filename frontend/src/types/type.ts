@@ -1,6 +1,5 @@
 import { AxiosError,AxiosResponse } from "axios"
 import { JSONContent } from "@tiptap/react"
-import { intersection } from "zod"
 export interface CustomAxiosError extends AxiosError{
   response?:AxiosResponse<{message:string}>
 }

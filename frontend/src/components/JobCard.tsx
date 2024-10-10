@@ -1,6 +1,3 @@
-import { api } from "@/utils/AxioApi";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 
 
 export function JobCard({
