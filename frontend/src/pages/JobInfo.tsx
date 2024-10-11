@@ -7,11 +7,13 @@ import { useEffect, useState } from "react"
 import { ConformationModal } from "@/components/ConformationModal"
 import {TiptapEditor} from "@/components/ParseTipTapData" 
 import { useRecoilState } from "recoil"
+import { UserProfileSkeleton } from "@/components/UserProfileSkeleton"
 export function JobInfo(){
   const { jobLink } = useParams();
   const [conformationmodal,setConformationmodal] = useRecoilState(ConformationModalState)
   const [job, setJob] = useState<CreateApplications>(CreateApplicationDefault);
   const [displaybutton,setDisplaybutton] = useState<boolean>(false);
+  const [isLoading,setIsLoading] = useState<boolean>(true)
 
   const getjob = async (): Promise<{Data:CreateApplications,applybutton:boolean}> => {
     try {
@@ -27,6 +29,7 @@ export function JobInfo(){
   };
 
   useEffect(() => {
+
     const fetchjob = async () => {
       const response = await getjob();
       setJob(response.Data);
@@ -44,9 +47,17 @@ export function JobInfo(){
       }));
 
       setDisplaybutton(response.applybutton);
+      setIsLoading(false)
     };
     fetchjob();
-  }, [getjob]);
+
+  },[]);
+
+  if(isLoading && job === CreateApplicationDefault){
+    return (
+      <UserProfileSkeleton/>
+    )
+  }
   return (
     <>
       <div className="sm:max-w-4xl sm:mx-auto space-y-4 p-3">
@@ -56,7 +67,7 @@ export function JobInfo(){
               <div className="flex justify-center">
                 <img
                   src={job.CompanyLogo as string}
-                  alt=""
+                  alt="company logo"
                   className="h-16  w-16 rounded-full object-cover"
                 />
               </div>

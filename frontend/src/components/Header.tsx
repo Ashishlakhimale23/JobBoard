@@ -28,6 +28,15 @@ export function Header(){
     }
   }, []);
 
+  useEffect(()=>{
+    if(settingsModal){
+      document.body.style.overflow = "hidden"
+    }else{
+      document.body.style.overflow = "auto"
+    }
+    
+  },[settingsModal])
+
   function settingmodal(e: MouseEvent) {
     if (imgRef.current !== null && modalRef.current !== null) {
       if (
@@ -90,7 +99,7 @@ export function Header(){
                 className=" px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left font-semibold"
                 onClick={() => {
                   setSettingsModal(false);
-                  navigate(`/${Name}`);
+                  navigate(`/${profile.Name}`);
                 }}
               >
                 Profile

@@ -62,7 +62,16 @@ module.exports = {
   				'5': 'hsl(var(--chart-5))'
   			}
   		}
-  	}
+  	},
+	animation: {
+        shimmer: 'shimmer 1.5s infinite linear',
+      },
+      keyframes: {
+         shimmer: {
+          '0%': {backgroundPosition: '100% 0'  },
+          '100%': {backgroundPosition: '-100% 0'  },
+        },
+      },
   },
   plugins: [addVariablesForColors,
 require('@tailwindcss/typography'),

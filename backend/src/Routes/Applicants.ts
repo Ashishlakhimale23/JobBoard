@@ -1,6 +1,6 @@
 import express from "express";
 import { upload } from "../Utils/Cloudinary";
-import { ApplyForJob, CreateApplication, EditProfile, GetAllApplications, GetAllApplicationsWithFullTime, GetAllApplicationsWithHybrid, GetAllApplicationsWithInternship, GetAllApplicationsWithRecent, GetAllApplicationsWithRemote, GetApplicants, GetAppliedforJobs, GetParticularJob, GetUploadedJobs, GetUser, GetUserData, updateApplicantStatus } from "../Controllers/Applicants";
+import { ApplyForJob, CreateApplication, DeleteJob, EditProfile, GetAllApplications, GetAllApplicationsWithFullTime, GetAllApplicationsWithHybrid, GetAllApplicationsWithInternship, GetAllApplicationsWithRecent, GetAllApplicationsWithRemote, GetApplicants, GetAppliedforJobs, GetParticularJob, GetUploadedJobs, GetUser, GetUserData, updateApplicantStatus } from "../Controllers/Applicants";
 import { AuthMidddleware } from "../Middlerware/Auth";
 export const ApplicantsRouter = express.Router();
 
@@ -20,3 +20,4 @@ ApplicantsRouter.get("/getjobuploaded",AuthMidddleware,GetUploadedJobs)
 ApplicantsRouter.get("/getappliedjobs",AuthMidddleware,GetAppliedforJobs);
 ApplicantsRouter.get("/getapplicants",AuthMidddleware,GetApplicants)
 ApplicantsRouter.patch("/updatestatus",AuthMidddleware,updateApplicantStatus);
+ApplicantsRouter.delete('/deletejob',AuthMidddleware,DeleteJob)

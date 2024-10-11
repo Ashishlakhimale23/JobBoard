@@ -7,6 +7,7 @@ import { CustomAxiosError } from "@/types/type";
 
 interface Applicant {
   ApplicantsID: {
+    _id:string,
     Name: string;
     Profile: string;
     skills: string[];
@@ -25,6 +26,8 @@ export function ShowApplicant() {
       const response = await api.get("/applicant/getapplicants", {
         params: { JobLink }
       });
+
+      console.log(response.data.Data)
       setApplied(response.data.Data.Applicants);
     } catch (error) {
       if (error) {
@@ -48,7 +51,7 @@ export function ShowApplicant() {
       
       
       setApplied(prev => prev.map(app => 
-        app._id === applicantId ? { ...app, status: newStatus } : app
+        app.ApplicantsID._id === applicantId ? { ...app, status: newStatus } : app
       ));
       
       toast.success("Status updated successfully");
@@ -74,7 +77,7 @@ export function ShowApplicant() {
       {applied.map((app) => (
         <ApplicantCard
           key={app._id}
-          applicantId={app._id}
+          applicantId={app.ApplicantsID._id}
           Name={app.ApplicantsID.Name}
           email={app.ApplicantsID.email}
           skills={app.ApplicantsID.skills}

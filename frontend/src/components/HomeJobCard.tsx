@@ -1,12 +1,25 @@
 import { OnTap } from "@/store/atom";
 import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
+import { Icons } from "./Icons";
+import { api } from "@/utils/AxioApi";
+import toast from "react-hot-toast";
 
 export function HomeJobCard({CompanyLogo,JobTitle,Type,WorkMode,Location,AverageSalary,JobLink}:{CompanyLogo:string,JobTitle:string,Type:string,WorkMode:string,Location:string,AverageSalary:number,JobLink:string}){
   const onTap = useRecoilValue(OnTap)
   const navigate = useNavigate()
+  const handleDeleteJob = async(e:any)=>{
+    e.stopPropagation()
+    try{
+    const response = await api.delete("/applicant/deletejob",{params:{JobLink:JobLink}})
+    if(response.status == 200){
+      return toast.success("Deleted Successfully.")
+    }
+    }catch(error){
+      return toast.error("Can't Delete")
+    }
+  }
   return (
-
     <>
       <div className="rounded-2xl bg-zinc-950/85 sm:flex sm:justify-between space-y-4 sm:space-y-0  px-4 py-6  hover:bg-neutral-900/90 transition-colors duration-300 antialiased"
       onClick={()=>navigate(`/job/${JobLink}`)}
@@ -35,6 +48,12 @@ export function HomeJobCard({CompanyLogo,JobTitle,Type,WorkMode,Location,Average
           navigate(`/applicants/${JobLink}`)}}
         >
           See Applicants 
+        </button>
+
+        <button className={`${location.pathname ==='/dashboard' && onTap =='uploaded' ? "px-3 text-sm py-1 h-fit text-zinc-100 hover:underline font-bold " :"hidden "}`}
+        onClick={handleDeleteJob}
+        >
+          <Icons.tarsh/>
         </button>
       </div>
     </div>

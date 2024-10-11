@@ -17,11 +17,11 @@ export const AuthMidddleware=async(req:Request,res:Response,next:NextFunction)=>
             console.log(authtoken)
             let checkrevoked = true 
             await admin.auth().verifyIdToken(authtoken,checkrevoked).then((payload)=>{
-
                 req.uid = payload.uid 
                 console.log("next")
                 next()
             }).catch((error)=>{
+                console.log(error)
                 let errormessage = error.code
                 console.log(errormessage)
                 if(errormessage == 'auth/id-token-revoked' || errormessage== 'auth/id-token-expired' ){

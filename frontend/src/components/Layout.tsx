@@ -19,6 +19,7 @@ export function Layout(){
       {!onheader.includes(location.pathname) && <Header/>}
         <Routes>
           <Route path="/" element={<Home/>} />
+
           <Route element={<PrivateRoute/>}>
           <Route path="/jobs" element={<Jobs/>} />
          <Route path="/createpost" element={<CreateApplication/>}/>

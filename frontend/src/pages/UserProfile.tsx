@@ -7,11 +7,14 @@ import { useRecoilState } from "recoil";
 import { UserProfile, UserProfileDefault } from "@/store/atom";
 import { TiptapEditor } from "@/components/ParseTipTapData";
 import { Icons } from "@/components/Icons";
+import { UserProfileSkeleton } from "@/components/UserProfileSkeleton";
 
 export function UserProfiles() {
   const { Name } = useParams();
+  console.log(Name)
   const [userProfile, setUserProfile] = useRecoilState(UserProfile);
   const [admin, setAdmin] = useState(false);
+  const [isLoading,setIsLoading] =useState<boolean>(true)
   const navigate = useNavigate();
   const getuserdata = async (): Promise<{
   Data: UsersProfile;
@@ -31,6 +34,7 @@ export function UserProfiles() {
 
 useEffect(() => {
   const fetchuserdata = async () => {
+
     const result = await getuserdata();
     setAdmin(result.admin);
 
@@ -48,14 +52,24 @@ useEffect(() => {
       education: result.Data.education.length
         ? JSON.parse(result.Data.education[0].toString())
         : result.Data.education,
+      Projects: result.Data.Projects.length
+        ? JSON.parse(result.Data.Projects[0].toString())
+        : result.Data.Projects,
     };
 
     setUserProfile(updatedProfile);
+    setIsLoading(false)
   };
 
   fetchuserdata();
-}, []);
+}, [Name]);
 
+
+  if(isLoading){
+    return(
+    <UserProfileSkeleton/>
+    )
+  }
   return (
     <>
       <div className="sm:max-w-4xl sm:mx-auto space-y-4 p-3">
@@ -97,10 +111,7 @@ useEffect(() => {
                       : "hidden"
                   }`}
                   onClick={() =>{ 
-                    
                     navigate("/editprofile")
-
-
                   }}
                 >
                   Edit
@@ -165,6 +176,39 @@ useEffect(() => {
                 </div>
                 <div className="text-white pt-1">
                   <TiptapEditor initialContent={work.AboutCourse} />
+                </div>
+              </div>
+            </>
+          ))}
+        </div>
+
+        <div className={`${!userProfile.Projects.length ? "hidden" : "block"}`}>
+          <p className="font-semibold text-white text-xl">Projects</p>
+          {userProfile.Projects.map((work, index) => (
+            <>
+              <div className="p-4" key={index}>
+                <div className="text-white text-[17px] sm:flex justify-between ">
+                  <p className="font-semibold ">{work.Title}</p>
+                  <div className="space-x-2">
+                <a
+                  href={work.GithubLink}
+                  target="_blank"
+                  className={`${work.GithubLink ? 'hover:underline text-white' : 'hidden'} `}
+                >
+                  Github
+                </a>
+                <a
+                  href={work.LiveLink as string}
+                  target="_blank"
+                  className={`${work.LiveLink? 'hover:underline text-white' : 'hidden'} `}
+                >
+                  Live Link
+                </a>
+</div>
+                </div>
+
+                <div className="text-white pt-1">
+                  <TiptapEditor initialContent={work.AboutProject} />
                 </div>
               </div>
             </>

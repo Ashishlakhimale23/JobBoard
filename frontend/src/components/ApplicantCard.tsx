@@ -26,32 +26,37 @@ export function ApplicantCard({
   applicantId,
   onStatusChange
 }: ApplicantCardProps) {
-  const navigate = useNavigate()
-  const parsedSkills = JSON.parse(skills.toString()).slice(0, 3)
-  
+  console.log(status)
+  const navigate = useNavigate();
+  const parsedSkills = JSON.parse(skills.toString()).slice(0, 3);
+
   const handleStatusChange = (newStatus: string) => {
     onStatusChange(applicantId, newStatus);
   };
-  
+
   return (
-    <div className="rounded-2xl bg-zinc-950/85 max-w-5xl mx-auto md:flex sm:justify-between space-y-4 md:space-y-0 px-4 py-6 hover:bg-neutral-900/90 transition-colors duration-300 antialiased">
-      <div className="md:flex md:space-x-3 space-y-4 md:space-y-0" onClick={() => navigate(`/${Name}`)}>
-<div className="md:flex md:space-x-3 space-y-4 md:space-y-0">
-            <div>
-              <img src={Profile} alt="" className="h-12 w-12 rounded-full" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-white break-words">
-                {Name}
-              </h2>
-              <p className="text-white break-words">{email}</p>
-            </div>
+    <div className="rounded-2xl bg-zinc-950/85 max-w-5xl mx-auto md:flex sm:justify-between space-y-4 md:space-y-0 px-4 py-6 hover:bg-neutral-900/90 transition-colors duration-300 antialiased"
+      onClick={() => navigate(`/${Name}`)}
+    >
+      <div
+        className="md:flex md:space-x-3 space-y-4 md:space-y-0"
+      >
+        <div className="md:flex md:space-x-3 space-y-4 md:space-y-0">
+          <div>
+            <img src={Profile} alt="" className="h-12 w-12 rounded-full" />
           </div>
-          
+          <div>
+            <h2 className="text-xl font-bold text-white break-words">{Name}</h2>
+            <p className="text-white break-words">{email}</p>
+          </div>
+        </div>
       </div>
       <div className="flex items-center flex-wrap gap-1 md:justify-center">
-        {parsedSkills.map((item:any, index:any) => (
-          <div key={index} className="px-2 text-white py-1 bg-zinc-800 rounded-full">
+        {parsedSkills.map((item: any, index: any) => (
+          <div
+            key={index}
+            className="px-2 text-white py-1 bg-zinc-800 rounded-full"
+          >
             {item}
           </div>
         ))}
@@ -71,7 +76,7 @@ export function ApplicantCard({
         </Select>
       </div>
     </div>
-  )
+  );
 }
 
 

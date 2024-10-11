@@ -3,6 +3,7 @@ import { Request,Response } from "express"
 import { CloudinaryUpload } from "../Utils/CloudinaryUpload";
 import { User } from "../Models/user";
 import { RemoveAnySpaces } from "../Utils/RemoveSpaces";
+import mongoose from "mongoose"
 
 export const CreateApplication =async (req:Request,res:Response)=>{
     const uid = req.uid
@@ -352,7 +353,7 @@ export const updateApplicantStatus = async (req: Request, res: Response) => {
   try {
     const application = await Application.findOne({
       JobLink,
-      'Applicants._id': applicantId
+      Applicants:{$elemMatch:{ApplicantsID: applicantId}}
     });
 
     if (!application) {
@@ -368,10 +369,12 @@ export const updateApplicantStatus = async (req: Request, res: Response) => {
       return res.status(403).json({ message: "You don't have permission to update this application" });
     }
 
+    console.log(applicantId)
+
     const updatedApplication = await Application.findOneAndUpdate(
       {
         JobLink,
-        'Applicants._id': applicantId
+      Applicants:{$elemMatch:{ApplicantsID: applicantId}}
       },
       {
         $set: {
@@ -380,11 +383,17 @@ export const updateApplicantStatus = async (req: Request, res: Response) => {
       },
       { new: true }
     );
-
     if (!updatedApplication) {
       return res.status(404).json({ message: "Failed to update status" });
     }
 
+    const updateOnUserSide = await User.findOneAndUpdate({_id:applicantId,Application:{$elemMatch:{ApplicationID:updatedApplication._id}}},{$set:{"Application.$.status":newStatus}})
+    
+
+    if(!updateOnUserSide){
+        return res.status(500).json({message:"internal server error"})
+    }
+    
     return res.status(200).json({
       message: "Status updated successfully",
       data: updatedApplication
@@ -394,4 +403,34 @@ export const updateApplicantStatus = async (req: Request, res: Response) => {
     console.error('Error updating applicant status:', error);
     res.status(500).json({ message: "Internal server error" });
   }
-};
+ };
+
+export const DeleteJob=async(req:Request,res:Response)=>{
+    const uid = req.uid;
+    const JobLink = req.query.JobLink
+    if(!JobLink){
+        return res.status(403).json({message:"JobLink not provided"})
+    }
+    try{
+        const job = await Application.findOne({JobLink:JobLink}) 
+        if(!job){
+            return res.status(500).json({message:"no job found"})
+        }
+        const check = await User.findOne({firebaseUid:uid,JobUploaded:job._id})
+        if(!check){
+            return res.status(500).json({message:'naughty hora ke'})
+        }
+        const deleteapplied = await User.updateMany({'Application.ApplicationID':job._id},{$pull:{Application:{ApplicationID:job._id}}})
+        const deleteApp = await Application.deleteOne({JobLink:JobLink})
+        if(!deleteApp){
+            return res.status(500).json({message:"deletion failed"})
+        }
+        check.JobUploaded = check.JobUploaded.filter((ele)=>ele.toString()!=job._id.toString()) 
+        await check.save();
+        return res.status(200).json({message:"deleted successfully"})
+
+    }catch(error){
+        return res.status(500).json({message:"internal server error"})
+    }
+
+}

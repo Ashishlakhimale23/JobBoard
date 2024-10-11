@@ -50,6 +50,9 @@ export function ProfileInfo(){
       education: result.data.Data.education.length
         ? JSON.parse(result.data.Data.education[0].toString())
         : result.data.Data.education,
+      Projects: result.data.Data.Projects.length
+        ? JSON.parse(result.data.Data.Projects[0].toString())
+        : result.data.Data.Projects,
     };
     setUserprofile(updatedProfile);
     }else{
