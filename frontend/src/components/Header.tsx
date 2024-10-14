@@ -2,10 +2,13 @@ import { useNavigate } from "react-router-dom";
 import {  SettingsModal, UserProfile } from "@/store/atom";
 import { useRef,useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue} from "recoil";
+import { signOut,getAuth } from "firebase/auth";
 export function Header(){
   const navigate = useNavigate();
   const imgRef = useRef<HTMLImageElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const auth = getAuth(); 
+  
   const [settingsModal, setSettingsModal] = useRecoilState(SettingsModal);
   const [profile, setProfile] = useState<{ Profile: string; Name: string }>({
     Profile: "",
@@ -13,20 +16,32 @@ export function Header(){
   });
   const { Profile, Name } = useRecoilValue(UserProfile);
 
+  const handleSignOut = () => {
+    signOut(auth)
+      .then(() => {
+        console.log("User signed out");
+        localStorage.removeItem("AccessToken"); 
+        localStorage.removeItem("application"); 
+        setSettingsModal(false)
+        navigate("/"); 
+      })
+      .catch((error) => {
+        console.error("Error signing out:", error);
+      });
+  };
   useEffect(() => {
     if (settingsModal) {
       document.body.addEventListener("mousedown", settingmodal);
     } else {
       document.body.removeEventListener("mousedown", settingmodal);
     }
-  }, [settingsModal, setSettingsModal, settingmodal]);
+  }, [settingsModal]);
 
   useEffect(() => {
-    if (!Profile) {
       const profile = localStorage.getItem("profile");
       profile ? setProfile(JSON.parse(profile)) : null;
-    }
-  }, []);
+    
+  }, [Profile]);
 
   useEffect(()=>{
     if(settingsModal){
@@ -76,7 +91,7 @@ export function Header(){
           </div>
           <div>
             <img
-              src={profile.Profile}
+              src={!Profile || typeof Profile !== 'string'  ? profile.Profile as string : Profile as string}
               className="w-11 h-11 rounded-full hover:opacity-75 md:w-[50px] md:h-[50px]"
               ref={imgRef}
               onClick={() => {
@@ -99,7 +114,7 @@ export function Header(){
                 className=" px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left font-semibold"
                 onClick={() => {
                   setSettingsModal(false);
-                  navigate(`/${profile.Name}`);
+                  navigate(`/${Name}`);
                 }}
               >
                 Profile
@@ -133,12 +148,7 @@ export function Header(){
               </button>
               <button
                 className="px-[10px] py-2 hover:bg-white hover:text-black rounded-md w-full text-left font-semibold"
-                onClick={() => {
-                  setSettingsModal(false);
-                  localStorage.removeItem("AccessToken");
-                  localStorage.removeItem("application");
-                  window.location.href = "/";
-                }}
+                onClick={handleSignOut}
               >
                 Signout
               </button>

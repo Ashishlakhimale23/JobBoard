@@ -1,6 +1,13 @@
-import { Navigate, Outlet } from "react-router-dom"
+import { useRecoilValue } from "recoil";
+import { authState } from "@/store/atom";
+import { Navigate,Outlet } from "react-router-dom";
 
-export function PrivateRoute(){
-    const token = localStorage.getItem("AccessToken")
-    return token ? <Outlet/> :  <Navigate to='/'/>
+export function PrivateRoute() {
+  const auth = useRecoilValue(authState);
+
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
 }

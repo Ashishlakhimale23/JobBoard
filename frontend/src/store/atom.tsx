@@ -24,6 +24,7 @@ export const CreateApplicationDefault: CreateApplications = {
     type: "doc",
     content: [],
   },
+  JobLink:""
 }; 
 
 
@@ -84,13 +85,7 @@ export const LoggedState = atom<boolean>({
    default:false
 })
 
-export const Application = atom<CreateApplications>({
-   key:"Applicaton",
-   default:(()=>{
-      const saved = localStorage.getItem("application");
-      return saved ? JSON.parse(saved) : CreateApplicationDefault;
-   })()
-})
+
 
 export const UserProfile = atom<UsersProfile>({
    key:"UserProfile",
@@ -116,4 +111,21 @@ export const OnTap =atom<string>({
   key:"OnTap",
   default:"uploaded"
 
+})
+
+export const authState = atom({
+  key: 'authState',
+  default: {
+    isAuthenticated: false,
+    isLoading: true,
+  },
+});
+
+
+export const Application = atom<CreateApplications>({
+   key:"Applicaton",
+   default:(()=>{
+      const saved = localStorage.getItem("application");
+      return saved ? JSON.parse(saved) : CreateApplicationDefault;
+   })()
 })

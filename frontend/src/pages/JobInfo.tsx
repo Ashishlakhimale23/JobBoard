@@ -1,21 +1,24 @@
 import { api } from "@/utils/AxioApi"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import {toast} from "react-hot-toast"
 import { CreateApplications } from "@/types/type"
-import { ConformationModalState, CreateApplicationDefault } from "@/store/atom"
+import { Application, ConformationModalState, CreateApplicationDefault } from "@/store/atom"
 import { useEffect, useState } from "react"
 import { ConformationModal } from "@/components/ConformationModal"
 import {TiptapEditor} from "@/components/ParseTipTapData" 
-import { useRecoilState } from "recoil"
+import { useRecoilState, useSetRecoilState } from "recoil"
 import { UserProfileSkeleton } from "@/components/UserProfileSkeleton"
 export function JobInfo(){
   const { jobLink } = useParams();
   const [conformationmodal,setConformationmodal] = useRecoilState(ConformationModalState)
   const [job, setJob] = useState<CreateApplications>(CreateApplicationDefault);
+  const setApplication = useSetRecoilState(Application)
   const [displaybutton,setDisplaybutton] = useState<boolean>(false);
+  const [admin,setAdmin] = useState<boolean>(false);
   const [isLoading,setIsLoading] = useState<boolean>(true)
+  const navigate = useNavigate()
 
-  const getjob = async (): Promise<{Data:CreateApplications,applybutton:boolean}> => {
+  const getjob = async (): Promise<{Data:CreateApplications,applybutton:boolean,admin:boolean}> => {
     try {
       const response = await api.get("/applicant/particularjob", {
         params: { jobLink: jobLink },
@@ -24,7 +27,7 @@ export function JobInfo(){
     } catch (error) {
       console.log(error)
       toast.error("Could'nt fetch the job.");
-      return {Data:CreateApplicationDefault,applybutton:false};
+      return {Data:CreateApplicationDefault,applybutton:false,admin:false};
     }
   };
 
@@ -47,6 +50,7 @@ export function JobInfo(){
       }));
 
       setDisplaybutton(response.applybutton);
+      setAdmin(response.admin)
       setIsLoading(false)
     };
     fetchjob();
@@ -102,6 +106,14 @@ export function JobInfo(){
               setConformationmodal(true)
             }}>
               Apply for this job
+            </button>
+           <button className={`text-black font-semibold px-4 py-2 rounded-full bg-white ${!admin ? 'hidden' : 'block'} `}
+            onClick={()=>{
+              setApplication(job)
+              navigate('/createpost')
+              
+            }}>
+              Edit
             </button>
           </div>
         </header>

@@ -3,65 +3,84 @@ import { Request,Response } from "express"
 import { CloudinaryUpload } from "../Utils/CloudinaryUpload";
 import { User } from "../Models/user";
 import { RemoveAnySpaces } from "../Utils/RemoveSpaces";
-import mongoose from "mongoose"
 
-export const CreateApplication =async (req:Request,res:Response)=>{
-    const uid = req.uid
-    if(!req.body){
-        return res.status(400).json({message:"application field is empty."})
-    }
-    
-    const {Category,AverageSalary,Type,WorkMode,Location,ApplicationLink,Responsibilities,Qualification,JobTitle,CompanyOverview,CompanyEmail,CompanyName} = req.body;
-    let jobLink:string ; 
-    let companyname = JobTitle.replace(/\s+/g,' ').trim();
-    let name = RemoveAnySpaces(JobTitle)
-
-    try{
-
-          const resp:number = await Application.countDocuments({ JobLink: companyname })
-            jobLink = `${resp ? name+resp :name}`
-            const resultnoofjobs:number = await Application.countDocuments({JobLink:jobLink})
-            let NoOfSpaces:number = resultnoofjobs ? resp + resultnoofjobs : resultnoofjobs
-            jobLink =`${resultnoofjobs ? name + NoOfSpaces : jobLink}`
-            
-        if(!req.file) {
-            return res.status(400).json({message:"No company logo"})
-        }
-        const Image = await CloudinaryUpload(req.file); 
-
-        const Createdapplication = new Application({
-            Category,
-            AverageSalary,
-            Type,
-            WorkMode,
-            Location,
-            ApplicationLink,
-            Qualification,
-            Responsibilities,
-            JobTitle,
-            CompanyOverview,
-            CompanyEmail,
-            CompanyLogo:Image,
-            CompanyName:companyname,
-            JobLink:jobLink
-
-        })
-        const response = await Createdapplication.save();
-        if(!response){
-            return res.status(500).json({message:"internal server error"});
-        }
-        const result = await User.findOneAndUpdate({firebaseUid:uid},{$push:{"JobUploaded":response._id}})
-        if(!result){
-
-            return res.status(500).json({message:'internal server error'});
-        }
-        
-        return res.status(201).json({message:"application uploaded"});
-    }catch(error){
-        return res.status(500).json({message:"internal server error"});
+export const CreateApplication = async (req: Request, res: Response) => {
+    const uid = req.uid;
+    if (!req.body) {
+        return res.status(400).json({ message: "Application fields are empty." });
     }
 
-}
+    const {
+        Category, AverageSalary, Type, WorkMode, Location, ApplicationLink, Responsibilities,
+        Qualification, JobTitle, CompanyOverview, CompanyEmail, CompanyName, JobLink, CompanyLogo
+    } = req.body;
+
+    let jobLink: string;
+    const trimmedJobTitle = CompanyName.replace(/\s+/g, ' ').trim();
+    const formattedJobTitle = RemoveAnySpaces(trimmedJobTitle);
+
+    const existingJobsCount:number = await Application.countDocuments({ CompanyName: trimmedJobTitle });
+    jobLink = `${existingJobsCount ? formattedJobTitle + existingJobsCount : formattedJobTitle}`;
+
+    const jobLinkCount:number = await Application.countDocuments({ JobLink: jobLink });
+    if (jobLinkCount) {
+        jobLink += jobLinkCount + existingJobsCount;
+    }
+
+    try {
+        if (JobLink) {
+            let editedApplication = {
+                Category, AverageSalary, Type, WorkMode, Location, ApplicationLink,
+                Qualification, Responsibilities, JobTitle, CompanyOverview, CompanyEmail,
+                CompanyName: trimmedJobTitle, JobLink: jobLink,CompanyLogo:CompanyLogo
+            };
+
+            if (req.file) {
+                const Image = await CloudinaryUpload(req.file);
+                editedApplication.CompanyLogo = Image;
+            } 
+
+            const result = await Application.findOneAndUpdate({ JobLink }, editedApplication);
+            if (!result) {
+                return res.status(500).json({ message: "Internal server error: Failed to update application." });
+            }
+            return res.status(200).json({ message: "Updated successfully",JobLink:jobLink});
+        }
+
+        if (!JobLink) {
+            if (!req.file) {
+                return res.status(400).json({ message: "Company logo is required for new application." });
+            }
+
+            const Image = await CloudinaryUpload(req.file);
+            const newApplication = new Application({
+                Category, AverageSalary, Type, WorkMode, Location, ApplicationLink,
+                Qualification, Responsibilities, JobTitle, CompanyOverview, CompanyEmail,
+                CompanyLogo: Image, CompanyName: trimmedJobTitle, JobLink: jobLink
+            });
+
+            const createdApplication = await newApplication.save();
+            if (!createdApplication) {
+                return res.status(500).json({ message: "Internal server error: Failed to create application." });
+            }
+
+            const userUpdate = await User.findOneAndUpdate(
+                { firebaseUid: uid },
+                { $push: { JobUploaded: createdApplication._id } },
+                { new: true }
+            );
+            if (!userUpdate) {
+                return res.status(500).json({ message: "Internal server error: Failed to update user." });
+            }
+
+            return res.status(201).json({ message: "Application uploaded successfully.",JobLink:jobLink });
+        }
+    } catch (error) {
+        console.error("Error in CreateApplication: ", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 
 
 export const GetAllApplications=async(req:Request,res:Response)=>{
@@ -133,23 +152,20 @@ export const GetAllApplicationsWithRecent=async(req:Request,res:Response)=>{
 export const GetParticularJob=async(req:Request,res:Response)=>{
     const uid = req.uid
     const jobLink = req.query.jobLink as string;
-    console.log(jobLink);
     if(!jobLink){
         return res.status(404).json({message:"no joblink"})
     }
     try{
         const response = await Application.findOne({JobLink:jobLink});
         
-        console.log(response?._id)
         const useruploaded = await User.findOne({firebaseUid:uid,JobUploaded:{$in:[response?._id]}})
-        console.log(useruploaded)
         const userapplied = await User.findOne({firebaseUid:uid,Application:{$elemMatch:{ApplicationID:response?._id}}})
-        console.log(userapplied)
         let appliedoruploder = userapplied != null || useruploaded != null ? true : false;
+        let admin = useruploaded !=null ? true:false
         if(!response){
             return res.status(404).json({message:"No application found"});
         }
-        return res.status(200).json({Data:response,applybutton:appliedoruploder});
+        return res.status(200).json({Data:response,applybutton:appliedoruploder,admin:admin});
     }catch(error){
         return res.status(500).json({message:'internal server error'})
     }
@@ -160,7 +176,6 @@ export const EditProfile=async(req:Request,res:Response)=>{
     if(!req.body){
         return res.status(400).json({message:"no data provided"})
     }
-    console.log(req.body)
     const {Name,
   AboutMe,
   workExperience,
@@ -168,8 +183,9 @@ export const EditProfile=async(req:Request,res:Response)=>{
   education,
   Linkedin,
   twitter,skills,
-Portfolio,Projects} = req.body
-    try{
+Portfolio,Projects
+    } = req.body
+    try {
          let Image
         if(req.file) {
            Image = await CloudinaryUpload(req.file); 
@@ -184,7 +200,7 @@ Portfolio,Projects} = req.body
         }
 
         
-        return res.status(200).json({message:"profile edited"});
+        return res.status(200).json({message:"profile edited",Profile:{Profile:response.Profile,Name:response.Name}});
     }catch(error){
         return res.status(500).json({message:"internal server error"});
     }

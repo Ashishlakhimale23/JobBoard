@@ -3,98 +3,69 @@ import { GoogleAuthProvider,signInWithPopup } from "firebase/auth";
 import {auth} from "../utils/FirebaseAuth"
 import {toast} from "react-hot-toast"
 import axios from "axios";
-import { JobCard } from "@/components/JobCard";
 import { useNavigate } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
+import { authState } from "@/store/atom";
 export function Home() {
+
+  const setAuthState = useSetRecoilState(authState)
   const navigate = useNavigate()
 
-  const handlegooglesubmit = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const idtoken = await result.user.getIdToken(true);
+  const handleGoogleAuth = async (type: "signin" | "signup") => {
+  const provider = new GoogleAuthProvider();
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const idToken = await result.user.getIdToken(true); 
 
-      if (!String(idtoken).length || idtoken === undefined) {
-        return toast.error("Error while signing up");
-      }
-
-      const response = await axios.post(`${process.env.BASE_URL}/user/login`, {
-        idtoken,
-      });
-
-      if (Object.values(response.data).includes("Logged in")) {
-        localStorage.setItem("AccessToken", idtoken);
-        navigate("/jobs") 
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error: any) {
-      const errorMessage: string = error.code;
-      switch (errorMessage) {
-        case "auth/invalid-credential":
-          toast.error("Invalid credentials, please check the sign-in method");
-          break;
-        case "auth/operation-not-supported-in-this-environment":
-          toast.error("HTTP protocol is not supported. Please use HTTPS");
-          break;
-        case "auth/popup-blocked":
-          toast.error("Popup has been blocked by the browser");
-          break;
-        case "auth/popup-closed-by-user":
-          toast.error("Popup has been closed by the user");
-          break;
-        case "auth/operation-not-allowed":
-          toast.error("Email/password accounts are not enabled");
-          break;
-        default:
-          toast.error("Internal server issue");
-          break;
-      }
+    if (!idToken) {
+      return toast.error("Error during authentication");
     }
-  };
 
-  const handleGoogleSubmit = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const idToken = await result.user.getIdToken(true);
+    
+    const apiEndpoint = type === "signup" 
+      ? `${process.env.BASE_URL}/user/signup` 
+      : `${process.env.BASE_URL}/user/login`;
 
-      if (!idToken) {
-        return toast.error("Error while signing up");
-      }
+    
+    const response = await axios.post(apiEndpoint, {
+      idtoken: idToken,
+    });
 
-      const response = await axios.post(`${process.env.BASE_URL}/user/signup`, {
-        idtoken: idToken,
-      });
-
-      if (Object.values(response.data).includes("created account")) {
-        localStorage.setItem("AccessToken",idToken);
-        navigate("/jobs") 
-      } else {
-        console.log(response.data.message)
-        return toast.error(response.data.message);
-      }
-    } catch (error: any) {
-      const errorMessage = error.code;
-      console.log(errorMessage)
-      switch (errorMessage) {
-        case "auth/operation-not-supported-in-this-environment":
-          toast.error("HTTP protocol is not supported. Please use HTTPS");
-          break;
-        case "auth/popup-blocked":
-          toast.error("Popup has been blocked by the browser");
-          break;
-        case "auth/popup-closed-by-user":
-          toast.error("Popup has been closed by the user before completion");
-          break;
-        case "auth/operation-not-allowed":
-          toast.error("Email/password accounts are not enabled");
-          break;
-        default:
-          toast.error("Internal server issue");
-      }
+    
+    if ((type === "signup" && response.data.message === "created account") ||
+        (type === "signin" && Object.values(response.data).includes("Logged in"))) {
+      localStorage.setItem("AccessToken",idToken);
+      setAuthState({ isAuthenticated: true, isLoading: false });
+      navigate('/jobs')
+    } else {
+      return toast.error(response.data.message); 
     }
-  };
+  } catch (error: any) {
+    const errorMessage = error.code;
+    console.log("Firebase auth error:", errorMessage);
+
+    
+    switch (errorMessage) {
+      case "auth/invalid-credential":
+        toast.error("Invalid credentials, please check the sign-in method");
+        break;
+      case "auth/operation-not-supported-in-this-environment":
+        toast.error("HTTP protocol is not supported. Please use HTTPS");
+        break;
+      case "auth/popup-blocked":
+        toast.error("Popup has been blocked by the browser");
+        break;
+      case "auth/popup-closed-by-user":
+        toast.error("Popup has been closed by the user");
+        break;
+      case "auth/operation-not-allowed":
+        toast.error("Email/password accounts are not enabled");
+        break;
+      default:
+        toast.error("Internal server issue");
+    }
+  }
+};
 
 
   
@@ -114,15 +85,15 @@ return (
       <div className="space-x-4 hidden sm:flex">
         <button
           className="px-4 sm:px-6 py-2 border border-white text-white rounded-lg hover:bg-white hover:text-black transition-colors"
-          onClick={handleGoogleSubmit}
+          onClick={()=>handleGoogleAuth("signup")}
         >
           Join now
         </button>
         <button
           className="px-4 sm:px-6 py-2 border bg-white text-black rounded-lg hover:bg-black hover:text-white transition-colors"
-          onClick={handlegooglesubmit}
+          onClick={()=>handleGoogleAuth("signin")}
         >
-          Signup
+          Signin
         </button>
       </div>
     </header>
@@ -153,78 +124,20 @@ return (
       <div className="space-x-4 block sm:hidden">
         <button
           className="px-4 sm:px-6 py-2 border border-white text-white rounded-lg hover:bg-white hover:text-black transition-colors"
-          onClick={handleGoogleSubmit}
+          onClick={()=>handleGoogleAuth("signup")}
         >
           Join now
         </button>
         <button
           className="px-4 sm:px-6 py-2 border bg-white text-black rounded-lg hover:bg-black hover:text-white transition-colors"
-          onClick={handlegooglesubmit}
+          onClick={()=>handleGoogleAuth("signin")}
         >
-          Signup
+          Signin
         </button>
       </div>
     </div>
   </div>
 
-
-  <div className=" z-10 px-4 md:px-6 py-16 space-y-6 max-w-7xl mx-auto min-h-screen ">
-    <div className="inline-block">
-      <p className="text-xl font-semibold text-white">Trending jobs</p>
-    </div>
-
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 ">
-<JobCard
-      Type="Development"
-      JobTitle="Full stack"
-      AverageSalary={90000}
-      Location=""
-      WorkMode="Remote"
-      CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"
-    />
-<JobCard
-      Type="Development"
-      JobTitle="Full stack"
-      AverageSalary={90000}
-      Location=""
-      WorkMode="Remote"
-      CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"
-    />
-    <JobCard
-      Type="Development"
-      JobTitle="Full stack"
-      AverageSalary={90000}
-      Location=""
-      WorkMode="Remote"
-      CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"
-    />
-    <JobCard
-      Type="Development"
-      JobTitle="Full stack"
-      AverageSalary={90000}
-      Location=""
-      WorkMode="Remote"
-      CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"
-    />
-    <JobCard
-      Type="Development"
-      JobTitle="Full stack"
-      AverageSalary={90000}
-      Location=""
-      WorkMode="Remote"
-      CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"
-    />
-    <JobCard
-      Type="Development"
-      JobTitle="Full stack"
-      AverageSalary={90000}
-      Location=""
-      WorkMode="Remote"
-      CompanyLogo="https://res.cloudinary.com/ddweepkue/image/upload/v1725848174/coursefiles/sisyphus.jpg"
-    />
-  </div>
-
-</div>
 </div>
 
   );

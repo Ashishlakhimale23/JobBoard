@@ -18,6 +18,12 @@ export function Dashboard(){
   const [uploadedjobs, setUploadedjobs] = useState<JobApplication[]>([]);
   const [applied, setApplied] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+   const handleJobDeleted = (JobLink: string) => {
+   
+    setUploadedjobs((prevJobs) => prevJobs.filter((job) => job.JobLink !== JobLink));
+  };
+
   const handleOnClickUpload = useCallback(async () => {
     setOnTap("uploaded");
     setIsLoading(true);
@@ -118,6 +124,7 @@ export function Dashboard(){
                 WorkMode={job.WorkMode}
                 CompanyLogo={job.CompanyLogo}
                 JobLink={job.JobLink}
+                DeleteJob={handleJobDeleted}
               />
             ))
           ) : (

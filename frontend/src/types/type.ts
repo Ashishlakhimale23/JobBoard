@@ -17,6 +17,7 @@ export interface CreateApplications{
   CompanyName:string,
   CompanyEmail:string,
   CompanyOverview:JSONContent 
+  JobLink?:string
 }
 
 export interface workexperience{

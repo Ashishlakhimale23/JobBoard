@@ -1,5 +1,5 @@
 import { Application, CreateApplicationDefault} from "@/store/atom";
-import {TextEditor} from "./TextEditor"
+import {TextEditor} from "../components/TextEditor"
 import {
   Select,
   SelectContent,
@@ -33,6 +33,7 @@ export function CreateApplication(){
     CompanyEmail,
     CompanyOverview,
     CompanyLogo,
+    JobLink
   } = createApplication;
 
   const navigate = useNavigate()
@@ -101,7 +102,7 @@ const ZodObject: ZodType<any> = zod.object({
           return !file || file.size <= 1024 * 1024 * 3; // 3MB limit (Update this according to your needs)
         }, "File size must be less than 3MB")
         .refine((file) => {
-          const ACCEPTED_FILE_TYPES = ['image/png']; // Ensure this is defined
+          const ACCEPTED_FILE_TYPES = ['image/png','image/jpeg','image/jpg']; // Ensure this is defined
           return ACCEPTED_FILE_TYPES.includes(file.type);
         }, "File must be a PNG")
     ),
@@ -138,7 +139,7 @@ const VerifyZodObject = (data: any) => {
     if (!Responsibilities) {
       return toast.error("Fill the field job description.");
     }
-    if (!CompanyLogo) {
+    if (!CompanyLogo && !JobLink) {
       return toast.error("Fill the company logo.");
     }
     if(!Location && WorkMode!="Remote"){
@@ -168,7 +169,7 @@ const VerifyZodObject = (data: any) => {
       );
       setCreateApplication(CreateApplicationDefault)
       toast.success(response.data.message);
-      navigate(`/job/${createApplication.JobTitle}`)
+      navigate(`/job/${response.data.JobLink}`)
     } catch (error) {
       if (error) {
         const axiosError = error as CustomAxiosError;
@@ -190,8 +191,16 @@ const VerifyZodObject = (data: any) => {
 
   useEffect(() => {
     localStorage.setItem("application", JSON.stringify(createApplication));
-  }, [handleInputChange, updateCompanyBio, updateJobDescription,handleSubmit]);
+    
+  }, [createApplication]);
 
+  useEffect(()=>{
+    setCreateApplication(createApplication)
+    return ()=>{
+      setCreateApplication(CreateApplicationDefault)
+    }
+
+  },[])
 
   return (
     <>

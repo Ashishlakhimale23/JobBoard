@@ -1,8 +1,5 @@
-import { OnTap } from "@/store/atom";
-import { useRecoilValue } from "recoil";
 import { useNavigate } from "react-router-dom";
 export function AppliedJobCard({CompanyLogo,JobTitle,Type,WorkMode,Location,JobLink,status}:{CompanyLogo:string,JobTitle:string,Type:string,WorkMode:string,Location:string,AverageSalary:number,JobLink:string,status:string}){
-    const onTap = useRecoilValue(OnTap)
   const navigate = useNavigate()
   return (
 

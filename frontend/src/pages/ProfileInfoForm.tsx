@@ -1,5 +1,5 @@
 import {  educationdefault, projectdefault, UserProfile, UserProfileDefault, workExperienceDefault} from "@/store/atom";
-import {TextEditor} from "./TextEditor"
+import {TextEditor} from "../components/TextEditor" 
 import { useRecoilState } from "recoil";
 import { JSONContent } from "@tiptap/react";
 import { useEffect, useState} from "react";
@@ -125,7 +125,7 @@ const handleProjectChanges=(field:keyof typeof projectdefault,value:string)=>{
   Name: zod.string({ message: "Requires a string" }),
   Linkedin: zod
     .string()
-    .regex(/^https:\/\/linkedin\.com\/in\/[A-Za-z0-9_-]+\/?$/, {
+    .regex(/^https:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9_-]+(\/)?$/, {
       message: "Must be a valid LinkedIn link",
     }),
   twitter: zod
@@ -191,6 +191,12 @@ const VerifyZodObject = (data: any) => {
         }
       );
       setUserprofile(UserProfileDefault);
+      setUserprofile((prev) => ({
+        ...prev,
+        Profile: response.data.Profile.Profile,
+        Name: response.data.Profile.Name,
+      }));
+      localStorage.setItem("profile",JSON.stringify(response.data.Profile));
       toast.success(response.data.message);
       navigate(`/${userprofile.Name}`)
       
@@ -474,6 +480,7 @@ const getpredicatedvalue = (value:string) => {
                     <input
                       id="Role"
                       type="text"
+
                       className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
                       value={work.Role}
                       autoComplete="off"
@@ -512,6 +519,8 @@ const getpredicatedvalue = (value:string) => {
                       </label>
                       <input
                         id="JoiningYear"
+
+                      autoComplete="off"
                         type="text"
                         className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
                         value={work.JoiningYear}
@@ -531,6 +540,8 @@ const getpredicatedvalue = (value:string) => {
                       <input
                       id="LeavingYear"
                         type="text"
+
+                      autoComplete="off"
                         className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
                         value={work.LeavingYear}
                       onChange={(e) =>
@@ -632,6 +643,8 @@ const getpredicatedvalue = (value:string) => {
                       </label>
                       <input
                         id="StartYear"
+
+                      autoComplete="off"
                         type="text"
                         className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
                         value={edu.StartYear}
@@ -651,6 +664,8 @@ const getpredicatedvalue = (value:string) => {
                       <input
                         id="EndYear"
                         type="text"
+
+                      autoComplete="off"
                         className="w-full bg-neutral-800/50 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-500 transition"
                         value={edu.EndYear}
                       onChange={(e) =>
