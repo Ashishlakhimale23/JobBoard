@@ -93,61 +93,6 @@ export const GetAllApplications=async(req:Request,res:Response)=>{
         return res.status(500).json({message:'internal error'})
     }
 }
-export const GetAllApplicationsWithFullTime=async(req:Request,res:Response)=>{
-    try{
-        const response = await Application.find({Type:'Full Time'}).select("JobTitle WorkMode Location Type AverageSalary JobLink CompanyLogo");
-        if(!response.length){
-            return res.status(404).json({ message: 'No applications found' });
-        }
-        return res.status(200).json({Data:response});
-    }catch(error){
-        return res.status(500).json({message:'internal error'})
-    }
-}
-export const GetAllApplicationsWithRemote=async(req:Request,res:Response)=>{
-    try{
-        const response = await Application.find({WorkMode:'Remote'}).select("JobTitle JobLink WorkMode Location Type AverageSalary CompanyLogo");
-        if(!response.length){
-            return res.status(404).json({ message: 'No applications found' });
-        }
-        return res.status(200).json({Data:response});
-    }catch(error){
-        return res.status(500).json({message:'internal error'})
-    }
-}
-export const GetAllApplicationsWithHybrid=async(req:Request,res:Response)=>{
-    try{
-        const response = await Application.find({WorkMode:'Hybrid'}).select("JobTitle WorkMode JobLink Location Type AverageSalary CompanyLogo");
-        if(!response.length){
-            return res.status(404).json({ message: 'No applications found' });
-        }
-        return res.status(200).json({Data:response});
-    }catch(error){
-        return res.status(500).json({message:'internal error'})
-    }
-}
-export const GetAllApplicationsWithInternship=async(req:Request,res:Response)=>{
-    try{
-        const response = await Application.find({Type:'Internship'}).select("JobTitle JobLink WorkMode Location Type AverageSalary CompanyLogo");
-        if(!response.length){
-            return res.status(404).json({ message: 'No applications found' });
-        }
-        return res.status(200).json({Data:response});
-    }catch(error){
-        return res.status(500).json({message:'internal error'})
-    }
-}
-export const GetAllApplicationsWithRecent=async(req:Request,res:Response)=>{
-    try{
-        const response = await Application.find({}).sort({createdAt:-1}).select("JobTitle WorkMode Location Type AverageSalary CompanyLogo JobLink");
-        if(!response.length){
-            return res.status(404).json({ message: 'No applications found' });
-        }
-        return res.status(200).json({Data:response});
-    }catch(error){
-        return res.status(500).json({message:'internal error'})
-    }
-}
 
 export const GetParticularJob=async(req:Request,res:Response)=>{
     const uid = req.uid

@@ -1,6 +1,7 @@
-import { CreateApplications, Education, workexperience } from "@/types/type"
-import { UsersProfile,Projects } from "@/types/type";
-import {atom} from "recoil"
+import { CreateApplications, Education, JobApplication, workexperience } from "@/types/type"
+import { UsersProfile,Projects,Jobs } from "@/types/type";
+import {atom, selector} from "recoil"
+
 //Defaults
 export const CreateApplicationDefault: CreateApplications = {
   JobTitle: "",
@@ -129,3 +130,34 @@ export const Application = atom<CreateApplications>({
       return saved ? JSON.parse(saved) : CreateApplicationDefault;
    })()
 })
+
+export const JobsApplication = atom<JobApplication[]>({
+  key:'Jobs',
+  default:[]
+})
+
+export const SelectedJobType = atom<Jobs>({
+  key:"selectedJobType",
+  default:Jobs.jobs
+})
+
+export const FilteredJobs = selector({
+  key:"FilteredJobs",
+  get:({get}) =>{
+    const jobs = get(JobsApplication)
+    const selected = get(SelectedJobType)
+
+    switch(selected){
+      case 'remote':
+        return jobs.filter((item)=>item.WorkMode==="Remote")
+      case 'fulltime':
+        return jobs.filter((item)=>item.Type==="Full Time")
+      case 'internship':
+        return jobs.filter((item)=>item.Type==="Internship")
+      case 'hybrid':
+        return jobs.filter((item)=>item.WorkMode==="Hybrid")
+      default:
+        return jobs
+    }
+  }
+}) 

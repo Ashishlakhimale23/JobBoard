@@ -12,7 +12,6 @@ export const api = axios.create({
   timeout: 10000,
 });
 
-// ... Concurrency class remains the same ...
 class Concurrency {
   queue: { resolve: Function; reject: Function }[];
   isRefreshing: boolean;
@@ -60,7 +59,6 @@ const refreshToken = async () => {
   }
 };
 
-// Updated request interceptor with correct types
 api.interceptors.request.use(
   function (config: InternalAxiosRequestConfig) {
     const token = localStorage.getItem("AccessToken");
@@ -78,7 +76,6 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor remains the same, but let's update types for consistency
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {

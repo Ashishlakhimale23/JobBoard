@@ -1,17 +1,40 @@
-import express, { urlencoded }  from "express";
+//express initialize 
+import express, { urlencoded } from "express";
 import { Connection } from "./Connection";
 import { config } from "dotenv";
 import { userrouter } from "./Routes/user";
 import cors from "cors";
 import { ApplicantsRouter } from "./Routes/Applicants";
-config()
-const app = express();
-app.use(express.json())
-app.use(urlencoded({extended:false}))
-app.use(cors())
-app.use('/user',userrouter)
-app.use('/applicant',ApplicantsRouter)
-Connection(process.env.DB_URL!)
-app.listen(8000,()=>{
-    console.log("Server started")
-})
+
+config(); 
+
+export const app = express();
+
+
+app.use(cors({
+    origin: ['http://localhost:5173'], 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true, 
+    optionsSuccessStatus: 200
+}));
+
+app.use(express.json());
+app.use(urlencoded({ extended: false }));
+
+
+app.use('/user', userrouter);
+app.use('/applicant', ApplicantsRouter);
+
+
+try {
+    Connection(process.env.DB_URL!);
+    console.log("Connected to the database successfully");
+} catch (error) {
+    console.error("Error connecting to the database:", error);
+}
+
+
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`);
+});

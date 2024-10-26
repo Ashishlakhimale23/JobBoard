@@ -67,3 +67,12 @@ export interface JobApplication {
   Location: string;
   JobLink:string
 }
+
+export enum Jobs {
+    remote = "remote",
+    fullTime = "fulltime",
+    hybrid = "hybrid",
+    internship = "internship",
+    jobs = "jobs",
+    recent = "recent"
+  }

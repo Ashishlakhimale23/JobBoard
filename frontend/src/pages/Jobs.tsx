@@ -2,37 +2,30 @@ import { HomeJobCard } from "../components/HomeJobCard"
 import { api } from "@/utils/AxioApi";
 import { useState,useEffect,useCallback } from "react";
 import debounce from "lodash.debounce"
-import { useSetRecoilState } from "recoil";
-import { UserProfile } from "@/store/atom";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { FilteredJobs, JobsApplication, SelectedJobType, UserProfile } from "@/store/atom";
 import { JobApplication } from "@/types/type";
 import { CardSkeleton } from "@/components/CardSkeleton";
+import { Jobs } from "@/types/type";
 
-export function Jobs() {
-  enum Jobs {
-    remote = "remote",
-    fullTime = "fulltime",
-    hybrid = "hybrid",
-    internship = "internship",
-    jobs = "jobs",
-    recent = "recent",
-  }
-
+export function JobsPage() {
+  
   const [search, setSearch] = useState("");
-  const [allApplications, setAllApplications] = useState<JobApplication[]>([]);
-  const [selectedJobType, setSelectedJobType] = useState<Jobs>(Jobs.jobs);
+  const [allApplications, setAllApplications] = useRecoilState(JobsApplication);
+  const filteredJobs = useRecoilValue(FilteredJobs)
+  const [selectedJobType, setSelectedJobType] = useRecoilState(SelectedJobType)
   const [searchpost, setSearchpost] = useState<JobApplication[]>([]);
   const setUserProfile = useSetRecoilState(UserProfile);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const getAllApplications = async (
-    jobType: Jobs
-  ): Promise<{
+  const getAllApplications = async (): Promise<{
     Data: JobApplication[];
     Profile: { Profile: string; Name: string };
   }> => {
     try {
       setIsLoading(true);
-      const response = await api.get(`/applicant/getallapplication${jobType}`);
+      const response = await api.get(`/applicant/getallapplicationjobs`);
+      console.log(response.data)
       return response.data;
     } catch (error) {
       console.log(error);
@@ -62,22 +55,25 @@ export function Jobs() {
     return () => {
       debouncedSearch.cancel();
     };
-  }, [search, debouncedSearch]);
+  }, [search,debouncedSearch]);
 
   useEffect(() => {
     const fetchApplications = async () => {
-      const result = await getAllApplications(selectedJobType);
+      const result = await getAllApplications();
       setAllApplications(result.Data);
-      setUserProfile((prev) => ({
+      
+       setUserProfile((prev) => ({
         ...prev,
         Profile: result.Profile.Profile,
         Name: result.Profile.Name,
       }));
-      localStorage.setItem("profile", JSON.stringify(result.Profile));
+      localStorage.setItem("profile", JSON.stringify(result.Profile)); 
+      
+      
     };
 
     fetchApplications();
-  }, [selectedJobType]);
+  }, []);
 
   const renderJobTypeButton = (type: Jobs, label: string) => (
     <button
@@ -138,14 +134,14 @@ export function Jobs() {
       </div>
 
       <div className="space-y-2">
-        {isLoading ? (<CardSkeleton/>):allApplications.length === 0 && !isLoading ? (
+        {isLoading ? (<CardSkeleton/>):filteredJobs.length === 0 && !isLoading ? (
           <div className="rounded-2xl bg-zinc-950/85 sm:flex sm:justify-center text-lg font-semibold space-y-4 sm:space-y-0 px-4 py-6 hover:bg-neutral-900/90 transition-colors duration-300 antialiased">
             {selectedJobType === "jobs" || selectedJobType === "internship"
               ? `No ${selectedJobType} available`
               : `No ${selectedJobType} jobs available`}
           </div>
         ) : (
-          <JobList jobs={search.length ? searchpost : allApplications} />
+          <JobList jobs={search.length ? searchpost : filteredJobs} />
         )}
       </div>
     </div>

@@ -2,7 +2,7 @@ import { Navigate, Route, Routes,useMatch } from "react-router-dom";
 import { PrivateRoute } from "./PrivateRoute";
 import { CreateApplication } from "../pages/CreateApplication";
 import { Home } from "../pages/LandingPage";
-import { Jobs } from "../pages/Jobs";
+import { JobsPage } from "../pages/Jobs";
 import { Header } from "./Header";
 import { JobInfo } from "@/pages/JobInfo";
 import { ProfileInfo } from "../pages/ProfileInfoForm";
@@ -13,6 +13,7 @@ import { jwtDecode } from "jwt-decode";
 import { useEffect } from "react";
 import { authState } from "@/store/atom";
 import { useRecoilState } from "recoil";
+import { PageNotFound } from "@/pages/PageNotFound";
 
 export function Layout() {
   const matchForEntry = useMatch("/");
@@ -59,13 +60,15 @@ export function Layout() {
           element={auth.isAuthenticated ? <Navigate to='/jobs' replace /> : <Home />}
         />
         <Route element={<PrivateRoute />}>
-          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs" element={<JobsPage />} />
           <Route path="/createpost" element={<CreateApplication />} />
           <Route path="/editprofile" element={<ProfileInfo />} />
           <Route path="/job/:jobLink" element={<JobInfo />} />
           <Route path="/:Name" element={<UserProfiles />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/applicants/:JobLink" element={<ShowApplicant />} />
+          <Route path="*" element={<PageNotFound/>} />
+
         </Route>
       </Routes>
     </>

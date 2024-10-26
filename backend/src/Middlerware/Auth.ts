@@ -19,6 +19,7 @@ export const AuthMidddleware=async(req:Request,res:Response,next:NextFunction)=>
                 req.uid = payload.uid 
                 next()
             }).catch((error)=>{
+                console.log(error)
                 let errormessage = error.code
                 console.log(errormessage)
                 if(errormessage == 'auth/id-token-revoked' || errormessage== 'auth/id-token-expired' ){

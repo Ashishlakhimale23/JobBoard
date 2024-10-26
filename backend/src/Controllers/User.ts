@@ -2,7 +2,6 @@ import { Request,Response } from "express"
 import { User } from "../Models/user"
 import {config} from "dotenv"
 import admin from "../Utils/firebaseadmin" 
-import { RemoveAnySpaces } from "../Utils/RemoveSpaces"
 config()
 
 export const handlesignin = async(req:Request<{},{},{idtoken:string}>,res:Response)=>{
@@ -35,17 +34,35 @@ export const handlesignin = async(req:Request<{},{},{idtoken:string}>,res:Respon
 }
 }
 
-export const handlelogin=async(req:Request<{},{},{idtoken:string}>,res:Response)=>{
-    const idtoken = await admin.auth().verifyIdToken(req.body.idtoken)
-    const userexist= await User.findOne({firebaseUid:idtoken.uid,email:idtoken.email}) 
-    if(!userexist){
-        return res.json({message:"user doesnt exist"}).status(404)
+export const handlelogin = async (req: Request<{},{},{idtoken: string}>, res: Response) => {
+    try {
+        console.log("Starting login process");
+
+        // Verify the Firebase ID token
+        console.time("verifyIdToken");
+        const idtoken = await admin.auth().verifyIdToken(req.body.idtoken);
+        console.timeEnd("verifyIdToken");
+        console.log("Token verified:", idtoken);
+
+        // Check if the user exists in your database
+        console.time("User.findOne");
+        const userExist = await User.findOne({ firebaseUid: idtoken.uid, email: idtoken.email });
+        console.timeEnd("User.findOne");
+
+        if (!userExist) {
+            console.log("User doesn't exist");
+            return res.status(404).json({ message: "User doesn't exist" });
+        } else {
+            console.log("User logged in successfully");
+            return res.status(200).json({ message: "Logged in" });
+        }
+    } catch (error) {
+        console.error("Error during login:", error);
+        return res.status(500).json({ message: "Internal Server Error", error: "error"});
     }
-    else{
-            
-    return res.status(200).json({message:"Logged in"})
-}
-}
+};
+
+
 
 export const handlecornjob = async(req:Request,res:Response)=>{
    return res.status(200).send("fine")

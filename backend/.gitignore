@@ -8,12 +8,16 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+api
+public
 dist
 dist-ssr
 *.local
 
 #Ignore .env files
 .env
+vercel.json
+
 
 # Editor directories and files
 .vscode/*

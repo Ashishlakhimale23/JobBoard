@@ -13,6 +13,8 @@ export function Home() {
 
   const handleGoogleAuth = async (type: "signin" | "signup") => {
   const provider = new GoogleAuthProvider();
+
+    toast.loading('Logging in...',{id:'loading'})
   try {
     const result = await signInWithPopup(auth, provider);
     const idToken = await result.user.getIdToken(true); 
@@ -33,7 +35,7 @@ export function Home() {
 
     
     if ((type === "signup" && response.data.message === "created account") ||
-        (type === "signin" && Object.values(response.data).includes("Logged in"))) {
+        (type === "signin" && response.status == 200)) {
       localStorage.setItem("AccessToken",idToken);
       setAuthState({ isAuthenticated: true, isLoading: false });
       navigate('/jobs')
@@ -64,6 +66,8 @@ export function Home() {
       default:
         toast.error("Internal server issue");
     }
+  }finally{
+    toast.dismiss('loading')
   }
 };
 
