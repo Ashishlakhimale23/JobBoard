@@ -17,7 +17,7 @@ const user = new mongoose.Schema({
     },
     Profile:{
         type:String,
-        default:"https://res.cloudinary.com/ddweepkue/image/upload/v1724660793/q2bq6n1v3xggakyprama.jpg",
+        default:"https://res.cloudinary.com/ddweepkue/image/upload/v1719301620/coursefiles/0cecfa5bd56a3a089467769c9ede571e.jpg",
     },
     Linkedin:{
         type:String,
