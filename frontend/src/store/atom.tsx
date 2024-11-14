@@ -161,3 +161,8 @@ export const FilteredJobs = selector({
     }
   }
 }) 
+
+export const ShareModalState = atom<boolean>({
+  key:"ShareModalState",
+  default:false
+})

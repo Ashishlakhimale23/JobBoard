@@ -133,11 +133,11 @@ const VerifyZodObject = (data: any) => {
     if (!CompanyEmail) {
       return toast.error("Fill the field company email.");
     }
-    if (!CompanyOverview) {
-      return toast.error("Fill the field company bio.");
+    if (!CompanyOverview.content?.length) {
+      return toast.error("Fill the field company overview.");
     }
-    if (!Responsibilities) {
-      return toast.error("Fill the field job description.");
+    if (!Responsibilities.content?.length) {
+      return toast.error("Fill the field responsibilities.");
     }
     if (!CompanyLogo && !JobLink) {
       return toast.error("Fill the company logo.");

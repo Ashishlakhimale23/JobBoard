@@ -4,7 +4,7 @@ export function AppliedJobCard({CompanyLogo,JobTitle,Type,WorkMode,Location,JobL
   return (
 
     <>
-      <div className="rounded-2xl bg-zinc-950/85 sm:flex sm:justify-between space-y-4 sm:space-y-0  px-4 py-6  hover:bg-neutral-900/90 transition-colors duration-300 antialiased"
+      <div className="rounded-2xl cursor-pointer bg-zinc-950/85 sm:flex sm:justify-between space-y-4 sm:space-y-0  px-4 py-6  hover:bg-neutral-900/90 transition-colors duration-300 antialiased"
       onClick={()=>navigate(`/job/${JobLink}`)}
       >
       <div className="sm:flex sm:space-x-3 space-y-4 sm:space-y-0">
