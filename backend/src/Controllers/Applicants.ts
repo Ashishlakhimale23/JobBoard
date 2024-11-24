@@ -3,7 +3,7 @@ import { Request,Response } from "express"
 import { CloudinaryUpload } from "../Utils/CloudinaryUpload";
 import { User } from "../Models/user";
 import { RemoveAnySpaces } from "../Utils/RemoveSpaces";
-
+import { Types } from "mongoose";
 export const CreateApplication = async (req: Request, res: Response) => {
     const uid = req.uid;
     if (!req.body) {
@@ -260,33 +260,86 @@ export const GetAppliedforJobs=async(req:Request,res:Response)=>{
 export const GetApplicants = async (req: Request, res: Response) => {
     const uid = req.uid;
     const jobLink = req.query.JobLink as string;
+    let filter: any = 1; 
+    let sortField: string = 'lowercaseName'; 
+
+    
+    switch (req.query.filter) {
+        case 'A-Z':
+            filter = 1;
+            break;
+        case 'Z-A':
+            filter = -1;
+            break;
+        case 'Newestfirst':
+            sortField = 'Applicants.createdAt'; 
+            filter = -1; 
+            break;
+        case 'Oldestfirst':
+            sortField = 'Applicants.createdAt'; 
+            filter = 1; 
+            break;
+        default:
+            filter = 1;
+    }
+    const queryMatch =req.query.status != "All" ?{'Applicants.status':req.query.status }:{};
 
     if (!jobLink) {
         return res.status(400).json({ message: "JobLink is required" });
     }
+    
 
     try {
-       
-        const application = await Application.findOne({ JobLink: jobLink })
-            .select('Applicants')
-            .populate({
-                path: 'Applicants.ApplicantsID',
-                select: {
-                    email: 1,
-                    Name: 1,
-                    Profile: 1,  
-                    skills: { $slice: 3 }
+        const application = await Application.aggregate([
+            { $match: { JobLink: jobLink } },
+            {$unwind:'$Applicants'},
+            {$match: queryMatch},       
+            {
+                $lookup: {
+                    from: 'users', 
+                    localField: 'Applicants.ApplicantsID',
+                    foreignField: '_id',
+                    as: 'applicantDetails'
                 }
-            });
+            },
+            { $unwind: '$applicantDetails' },
+            {
+                $project: {
+                    'applicantDetails.Name': 1,
+                    'applicantDetails.email': 1,
+                    'applicantDetails.Profile': 1,
+                    'applicantDetails.skills': { $slice: ['$applicantDetails.skills', 3] },
+                    'applicantDetails._id':1,
+                    'Applicants.status': 1,
+                    'Applicants.createdAt': 1, 
+                    'lowercaseName': { $toLower: '$applicantDetails.Name' }
+                }
+            },
+            { $sort: { [sortField]: filter } }, 
+            {
+                $group: {
+                    _id: '$_id',
+                    Applicants: {
+                        $push: {
+                            ApplicantsID: '$applicantDetails',
+                            status: '$Applicants.status',
+                            createdAt: '$Applicants.createdAt' 
+                        }
+                    }
+                }
+            },
+            
+            
+        ]);
 
-        if (!application) {
-            return res.status(400).json({ message: "Job application not found" });
+        console.log(application)
+        if (!application.length) {
+            return res.status(200).json({Data:application});
         }
 
-       
         const user = await User.findOne({
             firebaseUid: uid,
-            JobUploaded: application._id  
+            JobUploaded: application[0]._id
         });
 
         if (!user) {
@@ -294,9 +347,8 @@ export const GetApplicants = async (req: Request, res: Response) => {
         }
 
         return res.status(200).json({
-            Data: application
+            Data: application[0].Applicants
         });
-
     } catch (error) {
         console.error('Error in GetApplicants:', error);
         return res.status(500).json({ message: "Internal server error" });
@@ -395,3 +447,133 @@ export const DeleteJob=async(req:Request,res:Response)=>{
     }
 
 }
+
+export const RejectAll=async(req:Request,res:Response)=>{
+    const joblink = req.body.JobLink;
+    const uid = req.uid;
+    const Jobexists = await Application.findOne({JobLink:joblink});
+    if(!Jobexists){
+        return res.status(400).json({message:"application dose'nt exists"})
+    }
+    const admincheck = await User.findOne({firebaseUid:uid,JobUploaded:Jobexists._id})
+    if(!admincheck){
+        return res.status(400).json({message:"your not the admin of the application"})
+    }
+
+    const applicationUpdate = await Application.updateOne(
+  { JobLink: joblink },   {
+    $set: { "Applicants.$[elem].status": "Rejected" } 
+  },
+  {
+    arrayFilters: [
+      { "elem.status": { $ne: "Hired" } } 
+    ]
+  }
+    );
+    const usersUpdate = await User.updateMany({"Application.ApplicationID":Jobexists._id,'Application.status':{$ne:'Hired'}},{$set: { "Application.$.status": "Rejected" } })
+    return res.status(200).json({message:applicationUpdate})
+}
+
+interface BulkUpdateRequest {
+  bulkUpdate: string[];
+  newStatus: string;
+  JobLink: string;
+}
+
+export const BulkUpdate = async (
+  req: Request<{}, {}, BulkUpdateRequest>,
+  res: Response
+) => {
+  const uid = req.uid as string;
+  const { bulkUpdate: applicantIds, JobLink, newStatus } = req.body;
+
+  if (!applicantIds?.length || !JobLink || !newStatus) {
+    return res.status(400).json({
+      message: 'Missing required fields: applicantIds, JobLink, or newStatus'
+    });
+  }
+
+  try {
+    const validApplicantIds = applicantIds.filter(id => 
+      Types.ObjectId.isValid(id)
+    ).map(id => new Types.ObjectId(id));
+
+    if (validApplicantIds.length !== applicantIds.length) {
+      return res.status(400).json({
+        message: 'Invalid applicant IDs provided'
+      });
+    }
+
+    const jobApplication = await Application.findOne({ JobLink });
+    if (!jobApplication) {
+      return res.status(404).json({
+        message: 'Job application not found'
+      });
+    }
+
+    const adminUser = await User.findOne({
+      firebaseUid: uid,
+      JobUploaded: jobApplication._id
+    });
+    if (!adminUser) {
+      return res.status(403).json({
+        message: 'you do not have permission to modify this application'
+      });
+    }
+    
+    try {
+      
+        const applicationUpdate = await Application.updateOne(
+          { 
+            JobLink,
+            'Applicants.ApplicantsID': { $in: validApplicantIds }
+          },
+          {
+            $set: {
+              'Applicants.$[elem].status': newStatus
+            }
+          },
+          {
+            arrayFilters: [{ 'elem.ApplicantsID': { $in: validApplicantIds } }],
+            
+          }
+        );
+
+        if (!applicationUpdate.modifiedCount) {
+          return res.status(500).json({message:'Failed to update applicants in application'});
+        }
+
+        const userUpdate = await User.updateMany(
+          {
+            _id: { $in: validApplicantIds },
+            'Application.ApplicationID': jobApplication._id
+          },
+          {
+            $set: {
+              'Application.$[elem].status': newStatus
+            }
+          },
+          {
+            arrayFilters: [{ 'elem.ApplicationID': jobApplication._id }],
+          
+          }
+        );
+
+        if (!userUpdate.modifiedCount) {
+          return res.status(500).json({message:'Failed to update applicants in users'});
+        }
+   
+
+      return res.status(200).json({
+        message: 'Successfully updated application status',});
+
+    } catch (error) {
+      throw error;
+    } 
+  } catch (error) {
+    console.error('Bulk update error:', error);
+    return res.status(500).json({
+      message: error instanceof Error ? error.message : 'Internal server error'
+    });
+  }
+};

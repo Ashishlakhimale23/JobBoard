@@ -11,6 +11,7 @@ export function HomeJobCard({CompanyLogo,JobTitle,Type,WorkMode,Location,Average
   const navigate = useNavigate()
   const handleDeleteJob = async(e:any)=>{
     e.stopPropagation()
+    toast.loading("Deleting...",{id:"deleting"})
     try{
     const response = await api.delete("/applicant/deletejob",{params:{JobLink:JobLink}})
     if(response.status == 200){
@@ -19,6 +20,8 @@ export function HomeJobCard({CompanyLogo,JobTitle,Type,WorkMode,Location,Average
     }
     }catch(error){
       return toast.error("Can't Delete")
+    }finally{
+      toast.dismiss('deleting')
     }
   }
   return (

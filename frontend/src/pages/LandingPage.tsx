@@ -4,11 +4,11 @@ import {auth} from "../utils/FirebaseAuth"
 import {toast} from "react-hot-toast"
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
+import {useSetRecoilState} from "recoil";
 import { authState } from "@/store/atom";
 export function Home() {
 
-  const setAuthState = useSetRecoilState(authState)
+  const setAuthStates = useSetRecoilState(authState)
   const navigate = useNavigate()
 
   const handleGoogleAuth = async (type: "signin" | "signup") => {
@@ -37,7 +37,7 @@ export function Home() {
     if ((type === "signup" && response.data.message === "created account") ||
         (type === "signin" && response.status == 200)) {
       localStorage.setItem("AccessToken",idToken);
-      setAuthState({ isAuthenticated: true, isLoading: false });
+      setAuthStates({ isAuthenticated: true, isLoading: false });
       navigate('/jobs')
     } else {
       return toast.error(response.data.message); 
@@ -70,7 +70,6 @@ export function Home() {
     toast.dismiss('loading')
   }
 };
-
 
   
 return (

@@ -76,3 +76,10 @@ export enum Jobs {
     jobs = "jobs",
     recent = "recent"
   }
+
+export enum Filter {
+  atoz = 'A-Z',
+  ztoa = 'Z-A',
+  newest = "Newestfirst",
+  oldest = "Oldestfirst"
+}

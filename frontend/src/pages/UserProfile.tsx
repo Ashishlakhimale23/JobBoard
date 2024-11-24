@@ -3,8 +3,7 @@ import { api } from "@/utils/AxioApi";
 import { UsersProfile } from "@/types/type";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
-import { useRecoilState } from "recoil";
-import { UserProfile, UserProfileDefault } from "@/store/atom";
+import {  UserProfileDefault } from "@/store/atom";
 import { TiptapEditor } from "@/components/ParseTipTapData";
 import { Icons } from "@/components/Icons";
 import { UserProfileSkeleton } from "@/components/UserProfileSkeleton";
@@ -12,7 +11,7 @@ import { UserProfileSkeleton } from "@/components/UserProfileSkeleton";
 export function UserProfiles() {
   const { Name } = useParams();
   console.log(Name)
-  const [userProfile, setUserProfile] = useRecoilState(UserProfile);
+  const [userProfile, setUserProfile] = useState<UsersProfile>(UserProfileDefault);
   const [admin, setAdmin] = useState(false);
   const [isLoading,setIsLoading] =useState<boolean>(true)
   const navigate = useNavigate();

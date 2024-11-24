@@ -81,7 +81,7 @@ export function Dashboard(){
   }, []);
   return (
     <>
-      <section className="text-white">
+      <section className="text-white mx-2 my-2">
         <div
           className={`text-white space-y-1 text-lg bg-zinc-900 rounded-md p-2 max-w-xl mx-auto 
                          md:space-y-0 md:space-x-2 md:flex md:justify-center `}

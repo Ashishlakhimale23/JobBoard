@@ -54,7 +54,7 @@ const ApplicationSchema = new mongoose.Schema({
     required:true,
     unique:true
   },
- Applicants:[{
+  Applicants:[{
         ApplicantsID:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
@@ -63,6 +63,10 @@ const ApplicationSchema = new mongoose.Schema({
           type:String,
           enum: ["Applied","Under Review","Interviewed", "Hired","Rejected","On Hold","Withdrawn","No Response"],
           default:"Applied"
+        },
+        createdAt:{
+          type:Date,
+          default:Date.now
         }
     }],
 

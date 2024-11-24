@@ -1,6 +1,6 @@
 import express from "express";
 import { upload } from "../Utils/Cloudinary";
-import { ApplyForJob, CreateApplication, DeleteJob, EditProfile, GetAllApplications,GetApplicants, GetAppliedforJobs, GetParticularJob, GetUploadedJobs, GetUser, GetUserData, updateApplicantStatus } from "../Controllers/Applicants";
+import { ApplyForJob, BulkUpdate, CreateApplication, DeleteJob, EditProfile, GetAllApplications,GetApplicants, GetAppliedforJobs, GetParticularJob, GetUploadedJobs, GetUser, GetUserData, RejectAll, updateApplicantStatus } from "../Controllers/Applicants";
 import { AuthMidddleware } from "../Middlerware/Auth";
 export const ApplicantsRouter = express.Router();
 
@@ -16,3 +16,5 @@ ApplicantsRouter.get("/getappliedjobs",AuthMidddleware,GetAppliedforJobs);
 ApplicantsRouter.get("/getapplicants",AuthMidddleware,GetApplicants)
 ApplicantsRouter.patch("/updatestatus",AuthMidddleware,updateApplicantStatus);
 ApplicantsRouter.delete('/deletejob',AuthMidddleware,DeleteJob)
+ApplicantsRouter.patch("/rejectall",AuthMidddleware,RejectAll)
+ApplicantsRouter.patch("/bulkupdate",AuthMidddleware,BulkUpdate)

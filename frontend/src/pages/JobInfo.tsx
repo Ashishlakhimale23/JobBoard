@@ -60,6 +60,10 @@ export function JobInfo(){
 
   },[]);
 
+  const updateShowButton=()=>{
+    setDisplaybutton(true)
+  }
+
   if(isLoading && job === CreateApplicationDefault){
     return (
       <UserProfileSkeleton/>
@@ -169,7 +173,7 @@ export function JobInfo(){
           conformationmodal ? "top-0" : "top-full"
         } fixed px-2 w-full h-screen flex justify-center items-center sm:px-10`}
       >
-        <ConformationModal joblink={jobLink as string}/>
+        <ConformationModal joblink={jobLink as string} updateShowButton={updateShowButton}/>
       </div>
 
       <div

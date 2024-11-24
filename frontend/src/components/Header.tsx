@@ -66,7 +66,7 @@ export function Header(){
   }
   return (
     <>
-      <header className="flex justify-between  items-center max-w-7xl mx-auto px-4 md:px-6 py-6">
+      <header className="flex justify-between items-center mx-2 max-w-7xl xl:mx-auto px-4 md:px-6 py-5 my-4 sticky top-4 bg-zinc-950/15 z-50 shadow-lg shadow-neutral-600/5 backdrop-blur-lg border border-zinc-500/30 rounded-2xl">
         <div className=" font-bold text-2xl md:text-3xl">
           <span className="bg-gradient-to-tr from-pink-500 via-red-500 to-orange-500 bg-clip-text text-transparent">
             Skill
@@ -92,7 +92,7 @@ export function Header(){
           <div>
             <img
               src={!Profile || typeof Profile !== 'string'  ? profile.Profile as string : Profile as string}
-              className="w-11 h-11 rounded-full hover:opacity-75 md:w-[50px] md:h-[50px]"
+              className="w-11 h-11 rounded-full hover:opacity-75 md:w-[50px] md:h-[50px] cursor-pointer"
               ref={imgRef}
               onClick={() => {
                 setSettingsModal((prevSettingModal) => !prevSettingModal);

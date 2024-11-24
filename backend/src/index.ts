@@ -1,4 +1,4 @@
-//express initialize 
+
 import express, { urlencoded } from "express";
 import { Connection } from "./Connection";
 import { config } from "dotenv";
@@ -12,8 +12,8 @@ export const app = express();
 
 
 app.use(cors({
-    origin: ['http://localhost:5173'], 
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    origin: ['https://skillsphere.vercel.app'], 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH'],
     credentials: true, 
     optionsSuccessStatus: 200
 }));

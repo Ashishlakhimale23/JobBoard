@@ -134,7 +134,7 @@ export function JobsPage() {
       </div>
 
       <div className="space-y-2">
-        {isLoading ? (<CardSkeleton/>):filteredJobs.length === 0 && !isLoading ? (
+        {isLoading ? (<CardSkeleton/>):(filteredJobs.length === 0 && !isLoading) || (search.length && searchpost.length===0) ? (
           <div className="rounded-2xl bg-zinc-950/85 sm:flex sm:justify-center text-lg font-semibold space-y-4 sm:space-y-0 px-4 py-6 hover:bg-neutral-900/90 transition-colors duration-300 antialiased">
             {selectedJobType === "jobs" || selectedJobType === "internship"
               ? `No ${selectedJobType} available`

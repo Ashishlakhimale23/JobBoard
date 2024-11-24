@@ -4,16 +4,18 @@ import { useRecoilState } from "recoil"
 import { api } from "@/utils/AxioApi"
 import { CustomAxiosError } from "@/types/type"
 import {toast} from "react-hot-toast"
-export function ConformationModal({joblink}:{joblink:string}){
+export function ConformationModal({joblink,updateShowButton}:{joblink:string,updateShowButton:()=>void}){
   console.log(joblink)
     const [conformationmodal,setConformationmodal] = useRecoilState(ConformationModalState)
     const conformationRef = useRef<HTMLDivElement>(null)
     const ButtonRef = useRef<HTMLButtonElement>(null)
     const handleConfirmation=async()=>{
+      toast.loading('Applying...',{id:"applying"})
       try{
           const response = await api.post('/applicant/sumbitapplication',{joblink:joblink})
           if(response.status===200){
             setConformationmodal(false);
+            updateShowButton()
             return toast.success("Applied")
           }
           return toast.error("Internal server error");
@@ -31,8 +33,8 @@ export function ConformationModal({joblink}:{joblink:string}){
           return toast.error("An unexpected error occurred");
         }
       }
-
-
+    }finally{
+      toast.dismiss("applying")
     }
   }
     useEffect(()=>{

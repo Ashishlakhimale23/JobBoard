@@ -54,9 +54,8 @@ const user = new mongoose.Schema({
         ref:"Application"
         },
         status:{
-            type:String,
-            enum: ["Applied","Under Review","Interviewed","Hired","Rejected"],
-            default:"Applied",
+            type:mongoose.Schema.Types.String,
+            ref:'Application'
         }
     }
     ],

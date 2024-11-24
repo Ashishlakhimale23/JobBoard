@@ -6,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
 
 interface ApplicantCardProps {
   Name: string;
@@ -15,6 +16,9 @@ interface ApplicantCardProps {
   status: string;
   applicantId: string;  
   onStatusChange: (applicantId: string, newStatus: string) => void; 
+  bulkUpdate:string[];
+  handleBulkUpdate:(checked:boolean,applicantId:string)=>void;
+  bulkUpdateStatus:boolean
 }
 
 export function ApplicantCard({
@@ -24,18 +28,21 @@ export function ApplicantCard({
   skills,
   status,
   applicantId,
-  onStatusChange
+  onStatusChange,
+  bulkUpdate,
+  handleBulkUpdate,
+  bulkUpdateStatus
 }: ApplicantCardProps) {
   console.log(status)
   const navigate = useNavigate();
-  const parsedSkills = JSON.parse(skills.toString()).slice(0, 3);
+  const parsedSkills = skills.length ? JSON.parse(skills.toString()).slice(0, 3) : skills;
 
   const handleStatusChange = (newStatus: string) => {
     onStatusChange(applicantId, newStatus);
   };
 
   return (
-    <div className="rounded-2xl bg-zinc-950/85 max-w-5xl mx-auto md:flex sm:justify-between space-y-4 md:space-y-0 px-4 py-6 hover:bg-neutral-900/90 transition-colors duration-300 antialiased"
+    <div className="rounded-2xl bg-zinc-950/85 max-w-5xl mx-auto md:flex sm:justify-between space-y-4 md:space-y-0 px-4 py-6 hover:bg-neutral-900/90 transition-colors cursor-pointer duration-300 antialiased"
       onClick={() => navigate(`/${Name}`)}
     >
       <div
@@ -52,7 +59,7 @@ export function ApplicantCard({
         </div>
       </div>
       <div className="flex items-center flex-wrap gap-1 md:justify-center">
-        {parsedSkills.map((item: any, index: any) => (
+        {parsedSkills.length && parsedSkills.map((item: any, index: any) => (
           <div
             key={index}
             className="px-2 text-white py-1 bg-zinc-800 rounded-full"
@@ -60,6 +67,12 @@ export function ApplicantCard({
             {item}
           </div>
         ))}
+      </div>
+      <div className={bulkUpdateStatus ? "block content-center items-center ": "hidden"} onClick={(e)=>e.stopPropagation()}>
+        <Checkbox className= 'border-white'  checked={bulkUpdate.includes(applicantId)} onCheckedChange={(isChecked)=>{
+          let checked = isChecked as boolean
+          handleBulkUpdate(checked,applicantId)
+        }}/>
       </div>
       <div className="flex items-center">
         <Select value={status} onValueChange={handleStatusChange}>

@@ -21,8 +21,9 @@ export const AuthMidddleware=async(req:Request,res:Response,next:NextFunction)=>
             }).catch((error)=>{
                 console.log(error)
                 let errormessage = error.code
+                console.log(error)
                 console.log(errormessage)
-                if(errormessage == 'auth/id-token-revoked' || errormessage== 'auth/id-token-expired' ){
+                if(errormessage == 'auth/id-token-revoked' || errormessage == 'auth/id-token-expired' ){
                     return res.status(401).json({message:"token expired"}).end()
                 }else{
                     return res.status(401).json({message:"unauthorized"}).end()
